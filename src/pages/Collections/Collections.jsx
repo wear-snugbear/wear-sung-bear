@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useCart } from "../../context/CartContext"; // 🛒 Shared cart hook
-import products from "../../data/product"; // 🐻 Imported directly from your local product.js data file
+import { useCart } from "../../context/CartContext"; // 🛒 Shared cart hook // 🐻 Imported directly from your local product.js data file
 
 // ==========================================
 // 1. COMBINED GLOBAL BACKGROUND ANIMATION LAYER
@@ -430,10 +429,27 @@ function QuickViewModal({ product, onClose }) {
 // 7. MAIN COLLECTIONS WRAPPER COMPONENT
 // ==========================================
 export default function Collections() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All Collections");
   const [currentSort, setCurrentSort] = useState("featured");
   const [activeQuickView, setActiveQuickView] = useState(null);
 
+  // 1. Fetch data from your Python backend
+  useEffect(() => {
+    fetch('http://127.0.0.1:5000/api/products') // Adjust port if needed
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch products:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  // 2. Logic remains the same, now operating on the state fetched from backend
   const filteredProducts = products
     .filter((product) => {
       return selectedCategory === "All Collections" || product.collectionName === selectedCategory;
@@ -443,6 +459,10 @@ export default function Collections() {
       if (currentSort === "high-low") return b.price - a.price;
       return 0;
     });
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading Cozy Items... 🧸</div>;
+  }
 
   return (
     <div className="relative min-h-screen w-full bg-[#FFFBF9] px-4 py-12 md:px-8 z-10">
@@ -471,29 +491,16 @@ export default function Collections() {
             <SortDropdown currentSort={currentSort} setCurrentSort={setCurrentSort} />
           </div>
 
-          {filteredProducts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-[#6D442C]/10 bg-white/50">
-              <span className="text-4xl mb-2">☁️</span>
-              <h3 className="font-serif text-lg font-bold text-[#4D3A2A]">No Snuggle Layers Found</h3>
-              <button 
-                onClick={() => setSelectedCategory("All Collections")}
-                className="mt-4 rounded-xl bg-[#6D442C] px-4 py-2 text-xs font-bold text-white hover:bg-[#4D3A2A] transition-colors"
-              >
-                Clear Filters 🎀
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredProducts.map((product, index) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  index={index} 
-                  onQuickView={(p) => setActiveQuickView(p)}
-                />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredProducts.map((product, index) => (
+              <ProductCard 
+                key={product.id} 
+                product={product} 
+                index={index} 
+                onQuickView={(p) => setActiveQuickView(p)}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
