@@ -3,24 +3,26 @@ import React, { createContext, useContext, useState } from "react";
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
+  // Use 'cart' consistently as the state variable
   const [cart, setCart] = useState([]);
 
-  // Adds an item or increments quantity if it exists
-  const addToCart = (product) => {
+  // Adds an item or increments quantity if it exists with the same size
+  const addToCart = (product, chosenSize) => {
     setCart((prevCart) => {
-      // Check if product with the exact same ID and selectedSize already exists
-      const existingItem = prevCart.find(
-        (item) => item.id === product.id && item.selectedSize === product.selectedSize
+      // Find the index of the item that matches BOTH the id and the specific size
+      const existingIndex = prevCart.findIndex(
+        (item) => item.id === product.id && item.selectedSize === chosenSize
       );
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.id === product.id && item.selectedSize === product.selectedSize
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
+
+      if (existingIndex > -1) {
+        // If found, increment the quantity of that specific size variation
+        const updatedCart = [...prevCart];
+        updatedCart[existingIndex].quantity += 1;
+        return updatedCart;
       }
-      // Guarantee a fallback size if none was specified during quick view
-      return [...prevCart, { ...product, quantity: 1, selectedSize: product.selectedSize || "M" }];
+      
+      // If not found, add the new product object with the chosenSize and initial quantity 1
+      return [...prevCart, { ...product, selectedSize: chosenSize, quantity: 1 }];
     });
   };
 
@@ -57,5 +59,9 @@ export function CartProvider({ children }) {
 }
 
 export function useCart() {
-  return useContext(CartContext);
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
 }
