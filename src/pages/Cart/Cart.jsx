@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../context/CartContext"; // 🛒 Using your shared custom context hook
-
+import { useNavigate } from "react-router-dom";
 // ==========================================
 // 1. COMBINED GLOBAL BACKGROUND ANIMATION LAYER
 // ==========================================
@@ -64,6 +64,7 @@ function BackgroundAnimations() {
 // MAIN CART COMPONENT
 // ==========================================
 export default function Cart() {
+  const navigate = useNavigate();
   // Destructure context attributes mapped directly to your CartContext values
   const { cart, updateQuantity, removeFromCart } = useCart();
 
@@ -179,9 +180,12 @@ export default function Cart() {
                   <span className="text-sm font-black text-[#3A2A1D]">Total Amount</span>
                   <span className="text-lg font-black text-[#FF8580]">₹{total}</span>
                 </div>
-                <button className="w-full mt-2 h-11 bg-[#6D442C] text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:opacity-95 shadow-md active:scale-98 transition-all">
-                  Proceed to Checkout 🐻
-                </button>
+                <button 
+  onClick={() => navigate('/checkout')} // This redirects the user
+  className="w-full mt-2 h-11 bg-[#6D442C] text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:opacity-95 shadow-md active:scale-98 transition-all"
+>
+  Proceed to Checkout 🐻
+</button>
               </div>
             </motion.div>
           ) : (

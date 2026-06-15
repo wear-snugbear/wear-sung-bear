@@ -13,6 +13,9 @@ import Community from "./pages/Community/Community.jsx";
 import About from "./pages/About/About.jsx";
 import Contact from "./pages/Contact/Contact.jsx";
 import Cart from "./pages/Cart/Cart.jsx";
+import Checkout from "./pages/Checkout/Checkout.jsx";
+import Payment from "./pages/Payment/Payment.jsx";
+import TrackOrder from "./pages/TrackOrder/TrackOrder.jsx";
 
 function App() {
   const [showLanding, setShowLanding] = useState(true);
@@ -44,6 +47,9 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/track-order" element={<TrackOrder />} />
           </Routes>
         </main>
       </BrowserRouter>
