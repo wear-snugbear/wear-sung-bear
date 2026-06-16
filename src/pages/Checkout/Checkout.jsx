@@ -1,27 +1,53 @@
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
   const { cart } = useCart();
-  const navigate = useNavigate(); // 2. Initialize it
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleProceedToPayment = () => {
-    // 3. Create the order object
+  const handleProceedToPayment = async () => {
     const orderData = { 
       ...formData, 
       items: cart, 
       total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0) 
     };
-    
-    // 4. Navigate to Payment page, passing the data through 'state'
-    navigate('/payment', { state: { orderData } });
+
+    setLoading(true);
+
+    try {
+      // 1. Send the data to your Flask Backend
+      // Inside Checkout.jsx - find your fetch() function
+const response = await fetch('http://127.0.0.1:5000/api/checkout', {
+  method: 'POST', // <--- THIS IS THE MISSING PART
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(orderData), // Sending your order data
+});
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log("Order saved & email sent:", result);
+        // 2. Only navigate AFTER the backend confirms the order is saved
+        navigate('/payment', { state: { orderData, orderId: result.order_id } });
+      } else {
+        alert("Failed to place order: " + (result.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("Could not connect to the server. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,10 +79,13 @@ export default function Checkout() {
         </div>
 
         <button 
-          onClick={handleProceedToPayment} // 5. Trigger navigation
-          className="w-full mt-6 bg-[#6D442C] hover:bg-[#4D3A2A] text-white py-4 rounded-2xl font-black tracking-widest text-sm transition-all shadow-md active:scale-[0.98]"
+          onClick={handleProceedToPayment}
+          disabled={loading}
+          className={`w-full mt-6 py-4 rounded-2xl font-black tracking-widest text-sm transition-all shadow-md active:scale-[0.98] ${
+            loading ? "bg-[#7A6B5C] cursor-not-allowed" : "bg-[#6D442C] hover:bg-[#4D3A2A]"
+          } text-white`}
         >
-          PROCEED TO PAYMENT ✨
+          {loading ? "PROCESSING... ☁️" : "PROCEED TO PAYMENT ✨"}
         </button>
       </motion.div>
     </div>

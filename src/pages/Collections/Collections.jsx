@@ -432,32 +432,23 @@ export default function Collections() {
   const [loading, setLoading] = useState(true);
   const [currentSort, setCurrentSort] = useState("featured");
   const [activeQuickView, setActiveQuickView] = useState(null);
-  
-  // Get filter from URL
   const [searchParams] = useSearchParams();
   const filterFromUrl = searchParams.get("filter") || "All Collections";
-  
-  // FIX: Declare state only once, initialized with filterFromUrl
   const [selectedCategory, setSelectedCategory] = useState(filterFromUrl);
 
-  // 1. Fetch data from your Python backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
+        // Ensure your Flask backend is running and this URL is correct
         const response = await fetch('http://127.0.0.1:5000/api/products');
         
-        console.log("Response status:", response.status); 
-        
-        if (!response.ok) {
-          throw new Error(`Server returned ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Server returned ${response.status}`);
         
         const data = await response.json();
         setProducts(data);
       } catch (err) {
         console.error("Fetch error:", err);
-        setProducts([]); 
       } finally {
         setLoading(false);
       }

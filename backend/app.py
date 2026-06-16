@@ -17,11 +17,16 @@ def get_data_path(filename):
     return os.path.join(os.path.dirname(__file__), 'data', filename)
 
 def send_order_confirmation(user_email, order_id):
+    if not user_email:
+        print("Error: No email address provided.")
+        return
+
     msg = EmailMessage()
     msg['Subject'] = 'Order Confirmed! - Snugbear Store 🧸'
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = user_email
     
+    # Updated HTML with the Track Order link
     html_content = f"""
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #4D3A2A;">
@@ -42,10 +47,10 @@ def send_order_confirmation(user_email, order_id):
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
             smtp.send_message(msg)
+        print(f"Email sent successfully to {user_email}")
     except Exception as e:
         print(f"CRITICAL ERROR in SMTP: {e}")
-
-# --- User Routes ---
+# --- Routes ---
 
 @app.route('/', methods=['GET'])
 def home():
@@ -71,12 +76,15 @@ def get_orders_by_email(email):
 
 @app.route('/api/checkout', methods=['POST', 'OPTIONS'])
 def checkout():
-    if request.method == 'OPTIONS': return '', 200
-    order = request.json
-    if not order: return jsonify({"error": "No data"}), 400
+    if request.method == 'OPTIONS':
+        return '', 200
+        
+    order = request.get_json()
+    if not order: 
+        return jsonify({"error": "No data provided"}), 400
     
     order['order_id'] = str(uuid.uuid4())[:8]
-    order['status'] = 'Processing'  # Default status
+    order['status'] = 'Processing'
     
     file_path = get_data_path('orders.json')
     orders = []
@@ -90,9 +98,8 @@ def checkout():
         json.dump(orders, f, indent=4)
         
     send_order_confirmation(order.get('email'), order['order_id'])
+    
     return jsonify({"message": "Order placed!", "order_id": order['order_id']}), 200
-
-# --- Admin Routes ---
 
 @app.route('/api/admin/orders', methods=['GET'])
 def get_all_orders():
@@ -102,20 +109,18 @@ def get_all_orders():
         try: return jsonify(json.load(f))
         except: return jsonify([]), 500
 
-@app.route('/api/admin/orders/<order_id>', methods=['PATCH'])
+@app.route('/api/admin/orders/<order_id>', methods=['PATCH', 'OPTIONS'])
 def update_order(order_id):
-    data = request.json
+    if request.method == 'OPTIONS': return '', 200
+    data = request.get_json()
     new_status = data.get('status')
-    
     file_path = get_data_path('orders.json')
     with open(file_path, 'r', encoding='utf-8') as f:
         orders = json.load(f)
-    
     for order in orders:
         if order.get('order_id') == order_id:
             order['status'] = new_status
             break
-            
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(orders, f, indent=4)
     return jsonify({"message": "Order updated successfully"}), 200

@@ -76,5 +76,588 @@
         "total": 0,
         "paymentMethod": "UPI",
         "order_id": "2944e501"
+    },
+    {
+        "name": "Kritika Ruhela",
+        "email": "ruhela.kritika777@gmail.com",
+        "phone": "08958064957",
+        "address": "Near Jain Mandir, Chhipiwara\nPilkhuwa",
+        "items": [
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "Indulge in extra relaxed luxury. This piece features classic cozy patterns made with love, ultra-durable comfort seams, and premium heavy-knit cloud textures.",
+                "id": "honey-bear",
+                "image": "/images/Honey_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Honey Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "A soft, blush-toned oversized fit designed for maximum comfort. Perfect for lounge hours or casual aesthetic layers.",
+                "id": "rosy-bear",
+                "image": "/images/rosy_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Rosy Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            }
+        ],
+        "total": 1098,
+        "paymentMethod": "UPI",
+        "order_id": "0e4e41b7",
+        "status": "Processing"
+    },
+    {
+        "name": "Sneha",
+        "email": "snehakumari200204@gmail.com",
+        "phone": "08958064957",
+        "address": "Near Jain Mandir, Chhipiwara\nPilkhuwa",
+        "items": [
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "Indulge in extra relaxed luxury. This piece features classic cozy patterns made with love, ultra-durable comfort seams, and premium heavy-knit cloud textures.",
+                "id": "honey-bear",
+                "image": "/images/Honey_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Honey Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "A soft, blush-toned oversized fit designed for maximum comfort. Perfect for lounge hours or casual aesthetic layers.",
+                "id": "rosy-bear",
+                "image": "/images/rosy_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Rosy Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "An essential off-white, milky cloud layer offering premium dropped-shoulder relaxation cuts.",
+                "id": "creamy-bear",
+                "image": "/images/creamy_beary.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Creamy Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Moody Collection",
+                "collectionName": "Moody Collection",
+                "description": "Vibrant custom aesthetics meet heavy premium blends. Expressive styles for moody winter dreamscapes.",
+                "id": "daydream-bloom",
+                "image": "/images/daydream_bloom.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Daydream Bloom",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            }
+        ],
+        "total": 2346,
+        "paymentMethod": "UPI",
+        "order_id": "db872e6a",
+        "status": "Processing"
+    },
+    {
+        "name": "Sneha",
+        "email": "snehakumari200204@gmail.com",
+        "phone": "08958064957",
+        "address": "Near Jain Mandir, Chhipiwara\nPilkhuwa",
+        "items": [
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "Indulge in extra relaxed luxury. This piece features classic cozy patterns made with love, ultra-durable comfort seams, and premium heavy-knit cloud textures.",
+                "id": "honey-bear",
+                "image": "/images/Honey_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Honey Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "A soft, blush-toned oversized fit designed for maximum comfort. Perfect for lounge hours or casual aesthetic layers.",
+                "id": "rosy-bear",
+                "image": "/images/rosy_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Rosy Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "An essential off-white, milky cloud layer offering premium dropped-shoulder relaxation cuts.",
+                "id": "creamy-bear",
+                "image": "/images/creamy_beary.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Creamy Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Moody Collection",
+                "collectionName": "Moody Collection",
+                "description": "Vibrant custom aesthetics meet heavy premium blends. Expressive styles for moody winter dreamscapes.",
+                "id": "daydream-bloom",
+                "image": "/images/daydream_bloom.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Daydream Bloom",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            }
+        ],
+        "total": 2346,
+        "paymentMethod": "UPI",
+        "order_id": "fa82f3cd",
+        "status": "Processing"
+    },
+    {
+        "name": "Vibhu Rajput",
+        "email": "rohilla.kavita1999@gmail.com",
+        "phone": "08958064957",
+        "address": "Near Jain Mandir, Chhipiwara\nPilkhuwa",
+        "items": [
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "Indulge in extra relaxed luxury. This piece features classic cozy patterns made with love, ultra-durable comfort seams, and premium heavy-knit cloud textures.",
+                "id": "honey-bear",
+                "image": "/images/Honey_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Honey Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Cozy Choice",
+                "collectionName": "Moody Collection",
+                "description": "Tailored with loose premium loops to keep you floating all day. Snug, secure, and infinitely lazy.",
+                "id": "sleepy-baby",
+                "image": "/images/sleepy_baby.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Sleepy Baby",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Trending",
+                "collectionName": "Moody Collection",
+                "description": "Join the cozy collective. Features bold, statement-making graphic alignments with premium structural ribbing.",
+                "id": "crybaby-club",
+                "image": "/images/crybaby_club.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Crybaby Club",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Oversized Fit",
+                "collectionName": "Moody Collection",
+                "description": "Literally feels like a big warm hug. Packed with cloud insulation textures and structured drop-lining headers.",
+                "id": "honey-hug",
+                "image": "/images/Honey_Hug.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Honey Hug",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Limited Drop",
+                "collectionName": "Moody Collection",
+                "description": "An exclusive heavy drop featuring high density, low-sheen loops optimized for complete daytime hibernation.",
+                "id": "cloudy-nap",
+                "image": "/images/cloudy_nap.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Cloudy Nap",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            }
+        ],
+        "total": 3345,
+        "paymentMethod": "UPI",
+        "order_id": "7836449d",
+        "status": "Processing"
+    },
+    {
+        "name": "Vibhu Rajput",
+        "email": "ruhela.vibhu2005@gmail.com",
+        "phone": "08958064957",
+        "address": "Near Jain Mandir, Chhipiwara\nPilkhuwa",
+        "items": [
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "Indulge in extra relaxed luxury. This piece features classic cozy patterns made with love, ultra-durable comfort seams, and premium heavy-knit cloud textures.",
+                "id": "honey-bear",
+                "image": "/images/Honey_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Honey Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "A soft, blush-toned oversized fit designed for maximum comfort. Perfect for lounge hours or casual aesthetic layers.",
+                "id": "rosy-bear",
+                "image": "/images/rosy_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Rosy Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "An essential off-white, milky cloud layer offering premium dropped-shoulder relaxation cuts.",
+                "id": "creamy-bear",
+                "image": "/images/creamy_beary.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Creamy Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Moody Collection",
+                "collectionName": "Moody Collection",
+                "description": "Vibrant custom aesthetics meet heavy premium blends. Expressive styles for moody winter dreamscapes.",
+                "id": "daydream-bloom",
+                "image": "/images/daydream_bloom.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Daydream Bloom",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            }
+        ],
+        "total": 2346,
+        "order_id": "f0a348fd",
+        "status": "Processing"
+    },
+    {
+        "name": "Vibhu Rajput",
+        "email": "ruhela.vibhu2005@gmail.com",
+        "phone": "08958064957",
+        "address": "Near Jain Mandir, Chhipiwara\nPilkhuwa",
+        "items": [
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "Indulge in extra relaxed luxury. This piece features classic cozy patterns made with love, ultra-durable comfort seams, and premium heavy-knit cloud textures.",
+                "id": "honey-bear",
+                "image": "/images/Honey_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Honey Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "A soft, blush-toned oversized fit designed for maximum comfort. Perfect for lounge hours or casual aesthetic layers.",
+                "id": "rosy-bear",
+                "image": "/images/rosy_bear.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Rosy Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Basics Essential",
+                "collectionName": "Snugbear Basics",
+                "description": "An essential off-white, milky cloud layer offering premium dropped-shoulder relaxation cuts.",
+                "id": "creamy-bear",
+                "image": "/images/creamy_beary.png",
+                "isComingSoon": false,
+                "mrp": 799,
+                "name": "Creamy Bear",
+                "price": 549,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Moody Collection",
+                "collectionName": "Moody Collection",
+                "description": "Vibrant custom aesthetics meet heavy premium blends. Expressive styles for moody winter dreamscapes.",
+                "id": "daydream-bloom",
+                "image": "/images/daydream_bloom.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Daydream Bloom",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 3
+            },
+            {
+                "badge": "Cozy Choice",
+                "collectionName": "Moody Collection",
+                "description": "Tailored with loose premium loops to keep you floating all day. Snug, secure, and infinitely lazy.",
+                "id": "sleepy-baby",
+                "image": "/images/sleepy_baby.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Sleepy Baby",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 3
+            },
+            {
+                "badge": "Trending",
+                "collectionName": "Moody Collection",
+                "description": "Join the cozy collective. Features bold, statement-making graphic alignments with premium structural ribbing.",
+                "id": "crybaby-club",
+                "image": "/images/crybaby_club.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Crybaby Club",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Limited Drop",
+                "collectionName": "Moody Collection",
+                "description": "An exclusive heavy drop featuring high density, low-sheen loops optimized for complete daytime hibernation.",
+                "id": "cloudy-nap",
+                "image": "/images/cloudy_nap.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Cloudy Nap",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            },
+            {
+                "badge": "Classic Drop",
+                "collectionName": "Moody Collection",
+                "description": "A compact expression of modern oversized streetwear cut directly out of premium pastel threads.",
+                "id": "tiny-tantrum",
+                "image": "/images/tiny_tantrum.png",
+                "isComingSoon": false,
+                "mrp": 999,
+                "name": "Tiny Tantrum",
+                "price": 699,
+                "sizes": [
+                    "S",
+                    "M",
+                    "L",
+                    "XL"
+                ],
+                "selectedSize": "M",
+                "quantity": 1
+            }
+        ],
+        "total": 7938,
+        "order_id": "7288c93c",
+        "status": "Processing"
     }
 ]
