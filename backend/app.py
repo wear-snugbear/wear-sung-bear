@@ -1,130 +1,113 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import json
 import os
 import uuid
 import smtplib
+from datetime import datetime
 from email.message import EmailMessage
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+# Load environment variables (ensure your .env file is in the backend folder)
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-# --- Configuration ---
-EMAIL_ADDRESS = 'ruhela.kritika777@gmail.com'
-EMAIL_PASSWORD = 'rgahdwwyyeoifmvo' 
+# --- Database Setup ---
+mongo_uri = os.getenv("MONGO_URI")
 
-def get_data_path(filename):
-    return os.path.join(os.path.dirname(__file__), 'data', filename)
+client = MongoClient(
+    mongo_uri,
+    tls=True,
+    tlsAllowInvalidCertificates=True, # Bypasses strict cert validation
+    tlsAllowInvalidHostnames=True,   # Bypasses hostname checking
+    serverSelectionTimeoutMS=5000,   # Shorter timeout to fail fast
+    connectTimeoutMS=10000,
+    socketTimeoutMS=10000
+)
+
+# Test the connection immediately on startup
+try:
+    client.admin.command('ping')
+    print("Connection to MongoDB established successfully!")
+except Exception as e:
+    print(f"Connection Error: {e}")
+
+db = client['snugbear_db']
+
+# --- Configuration ---
+EMAIL_ADDRESS = os.getenv('EMAIL_USER', 'ruhela.kritika777@gmail.com')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASS', 'rgahdwwyyeoifmvo')
 
 def send_order_confirmation(user_email, order_id):
-    if not user_email:
-        print("Error: No email address provided.")
-        return
-
+    if not user_email: return
+    
     msg = EmailMessage()
     msg['Subject'] = 'Order Confirmed! - Snugbear Store 🧸'
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = user_email
     
-    # Updated HTML with the Track Order link
     html_content = f"""
     <html>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #4D3A2A;">
-        <h2 style="color: #6D442C;">Yay! Your Snuggles are on the way! 🧸</h2>
-        <p>Hi there,</p>
-        <p>Your order has been placed successfully.</p>
-        <p style="background: #FFF9F6; padding: 10px; border-radius: 8px;">
-            <strong>Order ID:</strong> {order_id}
-        </p>
-        <p>You can track your order status here:</p>
-        <a href="http://localhost:5173/track-order" style="background: #6D442C; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Track Order</a>
+      <body style="font-family: sans-serif; color: #4D3A2A;">
+        <h2>Yay! Your Snuggles are on the way! 🧸</h2>
+        <p>Your order (ID: <strong>{order_id}</strong>) has been placed successfully.</p>
+        <a href="http://localhost:5173/track-order" style="background: #6D442C; color: white; padding: 10px; text-decoration: none; border-radius: 5px;">Track Order</a>
       </body>
     </html>
     """
     msg.add_alternative(html_content, subtype='html')
-
+    
     try:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
             smtp.send_message(msg)
-        print(f"Email sent successfully to {user_email}")
     except Exception as e:
-        print(f"CRITICAL ERROR in SMTP: {e}")
-# --- Routes ---
+        print(f"SMTP Error: {e}")
 
-@app.route('/', methods=['GET'])
-def home():
-    return jsonify({"status": "success", "message": "Backend is running!"})
+# --- Routes ---
 
 @app.route('/api/products', methods=['GET'])
 def get_products():
-    file_path = get_data_path('products.json')
-    if not os.path.exists(file_path): return jsonify([]), 200
-    with open(file_path, 'r', encoding='utf-8') as f:
-        try: return jsonify(json.load(f))
-        except: return jsonify([]), 500
+    products = list(db.products.find({}, {'_id': 0})) 
+    return jsonify(products)
+
+@app.route('/api/checkout', methods=['POST'])
+def checkout():
+    order = request.get_json()
+    if not order: return jsonify({"error": "No data"}), 400
+    
+    # Adding metadata for professional management
+    order['order_id'] = str(uuid.uuid4())[:8]
+    order['status'] = 'Processing'
+    order['created_at'] = datetime.utcnow()
+    
+    db.orders.insert_one(order)
+    send_order_confirmation(order.get('email'), order['order_id'])
+    
+    return jsonify({"message": "Order placed!", "order_id": order['order_id']}), 201
 
 @app.route('/api/orders/<email>', methods=['GET'])
 def get_orders_by_email(email):
-    file_path = get_data_path('orders.json')
-    if not os.path.exists(file_path): return jsonify([]), 200
-    with open(file_path, 'r', encoding='utf-8') as f:
-        try: orders = json.load(f)
-        except: orders = []
-    user_orders = [o for o in orders if o.get('email', '').lower() == email.lower()]
+    # Sorting by date (newest first)
+    user_orders = list(db.orders.find({"email": {"$regex": email, "$options": "i"}}, {'_id': 0}).sort("created_at", -1))
     return jsonify(user_orders)
-
-@app.route('/api/checkout', methods=['POST', 'OPTIONS'])
-def checkout():
-    if request.method == 'OPTIONS':
-        return '', 200
-        
-    order = request.get_json()
-    if not order: 
-        return jsonify({"error": "No data provided"}), 400
-    
-    order['order_id'] = str(uuid.uuid4())[:8]
-    order['status'] = 'Processing'
-    
-    file_path = get_data_path('orders.json')
-    orders = []
-    if os.path.exists(file_path):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            try: orders = json.load(f)
-            except: orders = []
-    
-    orders.append(order)
-    with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump(orders, f, indent=4)
-        
-    send_order_confirmation(order.get('email'), order['order_id'])
-    
-    return jsonify({"message": "Order placed!", "order_id": order['order_id']}), 200
 
 @app.route('/api/admin/orders', methods=['GET'])
 def get_all_orders():
-    file_path = get_data_path('orders.json')
-    if not os.path.exists(file_path): return jsonify([]), 200
-    with open(file_path, 'r', encoding='utf-8') as f:
-        try: return jsonify(json.load(f))
-        except: return jsonify([]), 500
+    # Fetch all orders sorted by date
+    orders = list(db.orders.find({}, {'_id': 0}).sort("created_at", -1))
+    return jsonify(orders)
 
-@app.route('/api/admin/orders/<order_id>', methods=['PATCH', 'OPTIONS'])
+@app.route('/api/admin/orders/<order_id>', methods=['PATCH'])
 def update_order(order_id):
-    if request.method == 'OPTIONS': return '', 200
     data = request.get_json()
-    new_status = data.get('status')
-    file_path = get_data_path('orders.json')
-    with open(file_path, 'r', encoding='utf-8') as f:
-        orders = json.load(f)
-    for order in orders:
-        if order.get('order_id') == order_id:
-            order['status'] = new_status
-            break
-    with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump(orders, f, indent=4)
-    return jsonify({"message": "Order updated successfully"}), 200
+    result = db.orders.update_one({"order_id": order_id}, {"$set": {"status": data.get('status')}})
+    
+    if result.modified_count > 0:
+        return jsonify({"message": "Status updated"}), 200
+    return jsonify({"error": "Order not found"}), 404
 
 if __name__ == '__main__':
-    if not os.path.exists('data'): os.makedirs('data')
     app.run(debug=True, port=5000)

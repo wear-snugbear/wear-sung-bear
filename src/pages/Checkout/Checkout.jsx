@@ -14,6 +14,12 @@ export default function Checkout() {
   };
 
   const handleProceedToPayment = async () => {
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.address) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
     const orderData = { 
       ...formData, 
       items: cart, 
@@ -23,28 +29,27 @@ export default function Checkout() {
     setLoading(true);
 
     try {
-      // 1. Send the data to your Flask Backend
-      // Inside Checkout.jsx - find your fetch() function
-const response = await fetch('http://127.0.0.1:5000/api/checkout', {
-  method: 'POST', // <--- THIS IS THE MISSING PART
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(orderData), // Sending your order data
-});
+      // Sending data to your Flask/MongoDB backend
+      const response = await fetch('http://127.0.0.1:5000/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
 
       const result = await response.json();
 
       if (response.ok) {
-        console.log("Order saved & email sent:", result);
-        // 2. Only navigate AFTER the backend confirms the order is saved
+        console.log("Order saved to MongoDB:", result);
+        // Only navigate if backend confirmed the order insertion
         navigate('/payment', { state: { orderData, orderId: result.order_id } });
       } else {
         alert("Failed to place order: " + (result.error || "Unknown error"));
       }
     } catch (error) {
       console.error("Network error:", error);
-      alert("Could not connect to the server. Please try again.");
+      alert("Could not connect to the backend server. Make sure it's running!");
     } finally {
       setLoading(false);
     }
@@ -65,6 +70,7 @@ const response = await fetch('http://127.0.0.1:5000/api/checkout', {
             <input 
               key={field}
               name={field}
+              type={field === 'email' ? 'email' : 'text'}
               placeholder={field.charAt(0).toUpperCase() + field.slice(1)} 
               onChange={handleInputChange} 
               className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 bg-[#FFF9F6] focus:border-[#FF8580] outline-none transition-all placeholder:text-[#7A6B5C]/50 text-sm font-bold" 

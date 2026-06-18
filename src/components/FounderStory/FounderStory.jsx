@@ -9,7 +9,7 @@ export default function FounderStory() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <section className="relative w-full bg-[#FEFDE4] px-4 py-16 sm:px-6 md:py-24 lg:px-8 overflow-hidden">
+    <section className="relative w-full bg-[#F4F2EE] px-4 py-16 sm:px-6 md:py-24 lg:px-8 overflow-hidden">
       
       {/* Decorative Background Doodles */}
       <div className="absolute top-12 left-8 pointer-events-none select-none text-2xl opacity-20">✨</div>
