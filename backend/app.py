@@ -12,22 +12,21 @@ from dotenv import load_dotenv
 load_dotenv()
 print(f"DEBUG: Email User loaded: {os.getenv('EMAIL_USER')}")
 print(f"DEBUG: Email Pass loaded: {bool(os.getenv('EMAIL_PASS'))}") 
-# --------------------------------
+
 app = Flask(__name__)
 CORS(app, resources={
     r"/api/*": {
         "origins": ["https://snug-bear.netlify.app", "http://localhost:5173", "http://localhost:3000"]
     }
 })
+
 # --- Database Setup ---
 mongo_uri = os.getenv("MONGO_URI")
-
-# We use direct connection settings to bypass common network handshake issues
 client = MongoClient(
     mongo_uri,
     tls=True,
-    tlsAllowInvalidCertificates=True,  # Bypasses the ISP certificate interference
-    tlsAllowInvalidHostnames=True,     # Bypasses the ISP hostname interference
+    tlsAllowInvalidCertificates=True,
+    tlsAllowInvalidHostnames=True,
     serverSelectionTimeoutMS=30000,
     connectTimeoutMS=30000,
     socketTimeoutMS=30000
@@ -42,13 +41,13 @@ except Exception as e:
 db = client['snugbear_db']
 
 # --- Email Configuration ---
-# Ensure these match the variables in your .env file exactly
 EMAIL_ADDRESS = os.getenv('EMAIL_USER')
 EMAIL_PASSWORD = os.getenv('EMAIL_PASS')
 
 def send_order_confirmation(user_email, order_id):
+    # Check if config exists
     if not user_email or not EMAIL_ADDRESS or not EMAIL_PASSWORD:
-        print("Skipping email: Missing email configuration or recipient.")
+        print("Skipping email: Missing configuration or recipient.")
         return
     
     msg = EmailMessage()
@@ -68,8 +67,10 @@ def send_order_confirmation(user_email, order_id):
     msg.add_alternative(html_content, subtype='html')
     
     try:
-        # Using Gmail's standard SMTP port 465
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        # Using Gmail's port 587 with STARTTLS (more reliable than 465)
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.set_debuglevel(1)
+            smtp.starttls()
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
             smtp.send_message(msg)
             print(f"Confirmation email sent to {user_email}")
@@ -77,7 +78,6 @@ def send_order_confirmation(user_email, order_id):
         print(f"SMTP Error: {e}")
 
 # --- Routes ---
-
 @app.route('/', methods=['GET'])
 def home():
     return jsonify({"message": "Snugbear Backend is running!"})
@@ -94,7 +94,6 @@ def checkout():
     
     order['order_id'] = str(uuid.uuid4())[:8]
     order['status'] = 'Processing'
-    # Fixed the DeprecationWarning here:
     order['created_at'] = datetime.now(timezone.utc)
     
     db.orders.insert_one(order)
@@ -122,6 +121,5 @@ def update_order(order_id):
     return jsonify({"error": "Order not found"}), 404
 
 if __name__ == '__main__':
-    # Use the PORT environment variable provided by Render, default to 5000 if not found
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
