@@ -6,48 +6,55 @@ export default function Checkout() {
   const { cart } = useCart();
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
   const [loading, setLoading] = useState(false);
-  const [statusMsg, setStatusMsg] = useState(""); // New: For better UI feedback
+  const [statusMsg, setStatusMsg] = useState("");
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Inside your Checkout.jsx
-const handleProceedToPayment = async () => {
-  // ... existing validation ...
+  const handleProceedToPayment = async () => {
+    console.log("Button clicked, starting process...");
 
-  setLoading(true);
-  
-  // Increase the timeout to 60 seconds to allow Render time to "wake up"
-  const controller = new AbortController();
-  // Increase the timeout to 60 seconds (60000ms)
-// This gives the server plenty of time to respond even if it's "waking up"
-const id = setTimeout(() => controller.abort(), 60000);
-
-  try {
-    const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
-      method: "POST", // THIS MUST BE POST
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData), // THIS SENDS YOUR DATA
-      signal: controller.signal
-    });
-
-    clearTimeout(id); 
-
-    if (!response.ok) throw new Error("Server error");
-    
-    alert("Order placed successfully!");
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      // Provide a clearer message to the user
-      alert("The server is waking up from a sleep state. Please wait 10 seconds and try again.");
-    } else {
-      alert("Could not connect to the backend server.");
+    if (!formData.name || !formData.email || !formData.address) {
+      alert("Please fill in all required fields.");
+      return;
     }
-  } finally {
-    setLoading(false);
-  }
-};
+
+    setLoading(true);
+    setStatusMsg("Connecting to server...");
+
+    // DEFINE THESE MISSING VARIABLES
+    const orderData = { ...formData, cart }; 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); 
+
+    try {
+      const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+      
+      const result = await response.json();
+      alert("Order placed successfully!");
+      console.log("Success:", result);
+    } catch (error) {
+      console.error("DEBUG ERROR:", error);
+      
+      if (error.name === 'AbortError') {
+        setStatusMsg("Server took too long to wake up. Please try again.");
+      } else {
+        setStatusMsg("Connection failed. Check your network.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#FFFBF9] py-12 px-4 flex justify-center">
@@ -78,7 +85,6 @@ const id = setTimeout(() => controller.abort(), 60000);
           />
         </div>
 
-        {/* Dynamic status message area */}
         <AnimatePresence>
           {loading && (
             <motion.p 
@@ -93,7 +99,7 @@ const id = setTimeout(() => controller.abort(), 60000);
         <button 
           onClick={handleProceedToPayment}
           disabled={loading}
-          className={`w-full mt-6 py-4 rounded-2xl font-black tracking-widest text-sm transition-all shadow-md active:scale-[0.98] ${
+          className={`w-full mt-6 py-4 rounded-2xl font-black tracking-widest text-sm transition-all shadow-md ${
             loading ? "bg-[#A38B78] cursor-not-allowed" : "bg-[#6D442C] hover:bg-[#4D3A2A]"
           } text-white`}
         >
