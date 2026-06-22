@@ -20,13 +20,15 @@ const handleProceedToPayment = async () => {
   
   // Increase the timeout to 60 seconds to allow Render time to "wake up"
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 60000); 
+  // Increase the timeout to 60 seconds (60000ms)
+// This gives the server plenty of time to respond even if it's "waking up"
+const id = setTimeout(() => controller.abort(), 60000);
 
   try {
     const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
-      method: "POST",
+      method: "POST", // THIS MUST BE POST
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData),
+      body: JSON.stringify(orderData), // THIS SENDS YOUR DATA
       signal: controller.signal
     });
 
