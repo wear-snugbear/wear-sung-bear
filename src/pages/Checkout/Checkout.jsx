@@ -29,30 +29,19 @@ export default function Checkout() {
     setLoading(true);
 
     try {
-      // Sending data to your Flask/MongoDB backend
-      const response = await fetch('http://127.0.0.1:5000/api/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-      });
+  const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(orderData),
+  });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        console.log("Order saved to MongoDB:", result);
-        // Only navigate if backend confirmed the order insertion
-        navigate('/payment', { state: { orderData, orderId: result.order_id } });
-      } else {
-        alert("Failed to place order: " + (result.error || "Unknown error"));
-      }
-    } catch (error) {
-      console.error("Network error:", error);
-      alert("Could not connect to the backend server. Make sure it's running!");
-    } finally {
-      setLoading(false);
-    }
+  if (!response.ok) throw new Error("Server error");
+  
+  const data = await response.json();
+  // Handle success here
+} catch (error) {
+  alert("Could not connect to the backend server. Make sure it's running!");
+}
   };
 
   return (
