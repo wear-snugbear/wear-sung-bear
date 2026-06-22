@@ -491,23 +491,15 @@ export default function Collections() {
   const filterFromUrl = searchParams.get("filter") || "All Collections";
   const [selectedCategory, setSelectedCategory] = useState(filterFromUrl);
 
+  // CORRECTED: Single useEffect to fetch data
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        // Replace this line:
-// const response = await fetch("https://snugbear-backend.onrender.com/api/products");
-
-// Change this to your actual Render backend URL
-const API_URL = "https://snugbear-backend.onrender.com/api/products";
-
-useEffect(() => {
-  fetch(API_URL)
-    .then(res => res.json())
-    .then(data => setProducts(data)) // Ensure 'data' is what you expect
-    .catch(err => console.error("Fetch error:", err));
-}, []);
-const response = await fetch(`${API_BASE_URL}/api/products`);
+        // Use the Render backend URL
+        const API_URL = "https://snugbear-backend.onrender.com/api/products";
+        
+        const response = await fetch(API_URL);
         if (!response.ok) throw new Error(`Server returned ${response.status}`);
 
         const data = await response.json();
@@ -520,7 +512,7 @@ const response = await fetch(`${API_BASE_URL}/api/products`);
     };
 
     fetchProducts();
-  }, []);
+  }, []); // Only runs once on mount
 
   const filteredProducts = products
     .filter((product) => {
