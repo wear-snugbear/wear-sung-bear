@@ -16,7 +16,7 @@ print(f"DEBUG: Email Pass loaded: {bool(os.getenv('EMAIL_PASS'))}")
 app = Flask(__name__)
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["https://snug-bear.netlify.app", "http://localhost:5173", "http://localhost:3000"]
+        "origins": ["https://wear-snug-bear.netlify.app", "http://localhost:5173", "http://localhost:3000"]
     }
 })
 
