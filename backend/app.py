@@ -119,4 +119,6 @@ def update_order(order_id):
     return jsonify({"error": "Order not found"}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Use the PORT environment variable provided by Render, default to 5000 if not found
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

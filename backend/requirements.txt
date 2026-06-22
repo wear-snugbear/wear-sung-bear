@@ -1,6 +1,7 @@
 flask
 flask-cors
-pymongo
-dnspython
+pymongo[srv]>=4.17.0
+dnspython>=2.8.0
+certifi
 gunicorn
 python-dotenv
