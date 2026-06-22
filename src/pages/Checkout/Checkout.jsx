@@ -14,35 +14,47 @@ export default function Checkout() {
   };
 
   const handleProceedToPayment = async () => {
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.address) {
-      alert("Please fill in all required fields.");
-      return;
-    }
+  if (!formData.name || !formData.email || !formData.address) {
+    alert("Please fill in all required fields.");
+    return;
+  }
 
-    const orderData = { 
-      ...formData, 
-      items: cart, 
-      total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0) 
-    };
-
-    setLoading(true);
-
-    try {
-  const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(orderData),
-  });
-
-  if (!response.ok) throw new Error("Server error");
-  
-  const data = await response.json();
-  // Handle success here
-} catch (error) {
-  alert("Could not connect to the backend server. Make sure it's running!");
-}
+  const orderData = { 
+    ...formData, 
+    items: cart, 
+    total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0) 
   };
+
+  setLoading(true);
+
+  // Set a timeout controller
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+
+  try {
+    const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData),
+      signal: controller.signal
+    });
+
+    clearTimeout(id); // Clear timeout if response is received
+
+    if (!response.ok) throw new Error("Server error");
+    
+    // Handle success (e.g., navigate to success page)
+    alert("Order placed successfully!");
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      alert("The server is taking too long to respond (Cold Start). Please try again in a moment.");
+    } else {
+      alert("Could not connect to the backend server.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#FFFBF9] py-12 px-4 flex justify-center">
