@@ -1,35 +1,26 @@
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Checkout() {
   const { cart } = useCart();
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
   const [loading, setLoading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState(""); // New: For better UI feedback
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleProceedToPayment = async () => {
-  if (!formData.name || !formData.email || !formData.address) {
-    alert("Please fill in all required fields.");
-    return;
-  }
-
-  const orderData = { 
-    ...formData, 
-    items: cart, 
-    total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0) 
-  };
+  // Inside your Checkout.jsx
+const handleProceedToPayment = async () => {
+  // ... existing validation ...
 
   setLoading(true);
-
-  // Set a timeout controller
+  
+  // Increase the timeout to 60 seconds to allow Render time to "wake up"
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+  const id = setTimeout(() => controller.abort(), 60000); 
 
   try {
     const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
@@ -39,15 +30,15 @@ export default function Checkout() {
       signal: controller.signal
     });
 
-    clearTimeout(id); // Clear timeout if response is received
+    clearTimeout(id); 
 
     if (!response.ok) throw new Error("Server error");
     
-    // Handle success (e.g., navigate to success page)
     alert("Order placed successfully!");
   } catch (error) {
     if (error.name === 'AbortError') {
-      alert("The server is taking too long to respond (Cold Start). Please try again in a moment.");
+      // Provide a clearer message to the user
+      alert("The server is waking up from a sleep state. Please wait 10 seconds and try again.");
     } else {
       alert("Could not connect to the backend server.");
     }
@@ -85,14 +76,26 @@ export default function Checkout() {
           />
         </div>
 
+        {/* Dynamic status message area */}
+        <AnimatePresence>
+          {loading && (
+            <motion.p 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="mt-4 text-[10px] text-center font-bold text-[#6D442C] animate-pulse"
+            >
+              {statusMsg}
+            </motion.p>
+          )}
+        </AnimatePresence>
+
         <button 
           onClick={handleProceedToPayment}
           disabled={loading}
           className={`w-full mt-6 py-4 rounded-2xl font-black tracking-widest text-sm transition-all shadow-md active:scale-[0.98] ${
-            loading ? "bg-[#7A6B5C] cursor-not-allowed" : "bg-[#6D442C] hover:bg-[#4D3A2A]"
+            loading ? "bg-[#A38B78] cursor-not-allowed" : "bg-[#6D442C] hover:bg-[#4D3A2A]"
           } text-white`}
         >
-          {loading ? "PROCESSING... ☁️" : "PROCEED TO PAYMENT ✨"}
+          {loading ? "PROCESSING..." : "PROCEED TO PAYMENT ✨"}
         </button>
       </motion.div>
     </div>

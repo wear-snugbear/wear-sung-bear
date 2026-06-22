@@ -89,17 +89,27 @@ def get_products():
 
 @app.route('/api/checkout', methods=['POST'])
 def checkout():
-    order = request.get_json()
-    if not order: return jsonify({"error": "No data"}), 400
+    # 1. Get the data from the request
+    order = request.json 
     
+    if not order:
+        return jsonify({"error": "No data provided"}), 400
+
+    # 2. Add system-generated fields
     order['order_id'] = str(uuid.uuid4())[:8]
     order['status'] = 'Processing'
     order['created_at'] = datetime.now(timezone.utc)
     
-    db.orders.insert_one(order)
-    send_order_confirmation(order.get('email'), order['order_id'])
-    
-    return jsonify({"message": "Order placed!", "order_id": order['order_id']}), 201
+    # 3. Save to database
+    try:
+        db.orders.insert_one(order)
+        # 4. Trigger email
+        send_order_confirmation(order.get('email'), order['order_id'])
+        
+        return jsonify({"message": "Order placed!", "order_id": order['order_id']}), 201
+    except Exception as e:
+        print(f"Database Error: {e}")
+        return jsonify({"error": "Failed to save order"}), 500
 
 @app.route('/api/orders/<email>', methods=['GET'])
 def get_orders_by_email(email):
