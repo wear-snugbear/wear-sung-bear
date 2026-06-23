@@ -57,7 +57,7 @@ def send_order_confirmation(user_email, order_id):
       <body style="font-family: sans-serif; color: #4D3A2A;">
         <h2>Yay! Your Snuggles are on the way! 🧸</h2>
         <p>Your order (ID: <strong>{order_id}</strong>) has been placed successfully.</p>
-        <a href="https://snug-bear.netlify.app/track-order" style="background: #6D442C; color: white; padding: 10px; text-decoration: none; border-radius: 5px;">Track Order</a>
+        <a href="https://wear-snug-bear.netlify.app/track-order" style="background: #6D442C; color: white; padding: 10px; text-decoration: none; border-radius: 5px;">Track Order</a>
       </body>
     </html>
     """
@@ -109,11 +109,11 @@ def checkout():
         return jsonify({"error": "Could not save order"}), 500
     
     # Send email (in a try/except so it doesn't crash the server)
-    try:
-        send_order_confirmation(order.get('email'), order['order_id'])
-    except Exception as e:
-        print(f"DEBUG: Email failed but order saved: {e}")
-    
+    #try:
+     #   send_order_confirmation(order.get('email'), order['order_id'])
+    #except Exception as e:
+        #print(f"DEBUG: Email failed but order saved: {e}")
+    print("Email disabled temporarily")
     return jsonify({"message": "Order created!", "order_id": order['order_id']}), 201
 
 @app.route('/api/orders/<email>', methods=['GET'])
