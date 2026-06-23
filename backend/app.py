@@ -87,24 +87,28 @@ def get_products():
 
 @app.route('/api/checkout', methods=['POST', 'OPTIONS'])
 def checkout():
+    # Handle the preflight OPTIONS request
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+        
+    # Your existing logic
     order = request.json 
-    
     if not order:
         return jsonify({"error": "No data provided"}), 400
 
-    # 2. Add system-generated fields
+    # Add system fields
     order['order_id'] = str(uuid.uuid4())[:8]
     order['status'] = 'Processing'
     order['created_at'] = datetime.now(timezone.utc)
     
-    # 3. SAVE TO DATABASE (THIS WAS MISSING)
+    # Save to DB
     try:
         db.orders.insert_one(order) 
     except Exception as e:
         print(f"Database Error: {e}")
         return jsonify({"error": "Could not save order"}), 500
     
-    # 4. Email logic
+    # Send email (in a try/except so it doesn't crash the server)
     try:
         send_order_confirmation(order.get('email'), order['order_id'])
     except Exception as e:
