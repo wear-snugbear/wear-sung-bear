@@ -1,59 +1,47 @@
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
   const { cart } = useCart();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
   const [loading, setLoading] = useState(false);
-  const [statusMsg, setStatusMsg] = useState("");
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleProceedToPayment = async () => {
-    console.log("Button clicked, starting process...");
-
+    // Basic validation
     if (!formData.name || !formData.email || !formData.address) {
       alert("Please fill in all required fields.");
       return;
     }
 
-    setLoading(true);
-    setStatusMsg("Connecting to server...");
+    const orderData = { 
+      ...formData, 
+      items: cart, 
+      total: cart.reduce((acc, item) => acc + item.price * item.quantity, 0) 
+    };
 
-    // DEFINE THESE MISSING VARIABLES
-    const orderData = { ...formData, cart }; 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300000); 
+    setLoading(true);
 
     try {
-      const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-        signal: controller.signal
-      });
+  const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(orderData),
+  });
 
-      clearTimeout(timeoutId);
-
-      if (!response.ok) throw new Error(`Server responded with ${response.status}`);
-      
-      const result = await response.json();
-      alert("Order placed successfully!");
-      console.log("Success:", result);
-    } catch (error) {
-      console.error("DEBUG ERROR:", error);
-      
-      if (error.name === 'AbortError') {
-        setStatusMsg("Server took too long to wake up. Please try again.");
-      } else {
-        setStatusMsg("Connection failed. Check your network.");
-      }
-    } finally {
-      setLoading(false);
-    }
+  if (!response.ok) throw new Error("Server error");
+  
+  const data = await response.json();
+  // Handle success here
+} catch (error) {
+  alert("Could not connect to the backend server. Make sure it's running!");
+}
   };
 
   return (
@@ -85,25 +73,14 @@ export default function Checkout() {
           />
         </div>
 
-        <AnimatePresence>
-          {loading && (
-            <motion.p 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="mt-4 text-[10px] text-center font-bold text-[#6D442C] animate-pulse"
-            >
-              {statusMsg}
-            </motion.p>
-          )}
-        </AnimatePresence>
-
         <button 
           onClick={handleProceedToPayment}
           disabled={loading}
-          className={`w-full mt-6 py-4 rounded-2xl font-black tracking-widest text-sm transition-all shadow-md ${
-            loading ? "bg-[#A38B78] cursor-not-allowed" : "bg-[#6D442C] hover:bg-[#4D3A2A]"
+          className={`w-full mt-6 py-4 rounded-2xl font-black tracking-widest text-sm transition-all shadow-md active:scale-[0.98] ${
+            loading ? "bg-[#7A6B5C] cursor-not-allowed" : "bg-[#6D442C] hover:bg-[#4D3A2A]"
           } text-white`}
         >
-          {loading ? "PROCESSING..." : "PROCEED TO PAYMENT ✨"}
+          {loading ? "PROCESSING... ☁️" : "PROCEED TO PAYMENT ✨"}
         </button>
       </motion.div>
     </div>
