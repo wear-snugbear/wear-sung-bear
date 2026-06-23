@@ -26,7 +26,7 @@ export default function Checkout() {
     // DEFINE THESE MISSING VARIABLES
     const orderData = { ...formData, cart }; 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 120000); 
+    const timeoutId = setTimeout(() => controller.abort(), 300000); 
 
     try {
       const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
