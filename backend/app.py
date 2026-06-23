@@ -14,11 +14,8 @@ print(f"DEBUG: Email User loaded: {os.getenv('EMAIL_USER')}")
 print(f"DEBUG: Email Pass loaded: {bool(os.getenv('EMAIL_PASS'))}") 
 
 app = Flask(__name__)
-CORS(app, resources={
-    r"/api/*": {
-        "origins": ["https://wear-snug-bear.netlify.app", "http://localhost:5173", "http://localhost:3000"]
-    }
-})
+# Replace your existing CORS block with this:
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # --- Database Setup ---
 mongo_uri = os.getenv("MONGO_URI")
@@ -68,7 +65,8 @@ def send_order_confirmation(user_email, order_id):
     
     try:
         # Using Gmail's port 587 with STARTTLS (more reliable than 465)
-        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        # Update the smtp connection line in send_order_confirmation
+        with smtplib.SMTP('smtp.gmail.com', 587, timeout=10) as smtp:
             smtp.set_debuglevel(1)
             smtp.starttls()
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
@@ -87,9 +85,8 @@ def get_products():
     products = list(db.products.find({}, {'_id': 0})) 
     return jsonify(products)
 
-@app.route('/api/checkout', methods=['POST'])
+@app.route('/api/checkout', methods=['POST', 'OPTIONS'])
 def checkout():
-    # 1. Get the data from the request
     order = request.json 
     
     if not order:
@@ -100,16 +97,20 @@ def checkout():
     order['status'] = 'Processing'
     order['created_at'] = datetime.now(timezone.utc)
     
-    # 3. Save to database
+    # 3. SAVE TO DATABASE (THIS WAS MISSING)
     try:
-        db.orders.insert_one(order)
-        # 4. Trigger email
-        send_order_confirmation(order.get('email'), order['order_id'])
-        
-        return jsonify({"message": "Order placed!", "order_id": order['order_id']}), 201
+        db.orders.insert_one(order) 
     except Exception as e:
         print(f"Database Error: {e}")
-        return jsonify({"error": "Failed to save order"}), 500
+        return jsonify({"error": "Could not save order"}), 500
+    
+    # 4. Email logic
+    try:
+        send_order_confirmation(order.get('email'), order['order_id'])
+    except Exception as e:
+        print(f"DEBUG: Email failed but order saved: {e}")
+    
+    return jsonify({"message": "Order created!", "order_id": order['order_id']}), 201
 
 @app.route('/api/orders/<email>', methods=['GET'])
 def get_orders_by_email(email):
