@@ -17,7 +17,7 @@ import Checkout from "./pages/Checkout/Checkout.jsx";
 import Payment from "./pages/Payment/Payment.jsx";
 import TrackOrder from "./pages/TrackOrder/TrackOrder.jsx";
 import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
-
+import FoundingCircle from "./pages/FoundingCircle/FoundingCircle.jsx";
 function App() {
   const [showLanding, setShowLanding] = useState(true);
 
@@ -52,6 +52,7 @@ function App() {
             <Route path="/payment" element={<Payment />} />
             <Route path="/track-order" element={<TrackOrder />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/founding-circle" element={<FoundingCircle />} />
           </Routes>
         </main>
       </BrowserRouter>

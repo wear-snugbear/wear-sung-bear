@@ -12,6 +12,8 @@ export default function Checkout() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // ... inside your Checkout component ...
+
   const handleProceedToPayment = async () => {
     if (!formData.name || !formData.email || !formData.address || !paymentMethod) {
       alert("Please complete all details and select a payment method.");
@@ -19,10 +21,23 @@ export default function Checkout() {
     }
 
     setLoading(true);
-    const orderData = { ...formData, cart, paymentMethod };
+
+    // 1. Calculate the total here
+    const calculatedTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+    // 2. Add 'total' to the orderData object
+    const orderData = { 
+      ...formData, 
+      cart, 
+      paymentMethod,
+      total: calculatedTotal 
+    };
 
     try {
-      const response = await fetch("http://localhost:5000/api/checkout", {
+      // Use the actual API URL if deployed, or localhost for testing
+      const API_BASE = "http://localhost:5000"; 
+      
+      const response = await fetch(`${API_BASE}/api/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
@@ -33,11 +48,14 @@ export default function Checkout() {
       
       alert(`Success! Your Tracking ID: ${result.tracking_id}`);
     } catch (error) {
+      console.error(error);
       alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+// ... the rest of your component (return statement) remains the same ...
 
   return (
     <div className="min-h-screen bg-[#FFFBF9] py-12 px-4 flex justify-center items-start">

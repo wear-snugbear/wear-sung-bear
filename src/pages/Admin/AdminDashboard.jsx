@@ -1,12 +1,40 @@
 import React, { useState, useEffect } from "react";
 
+// Set your Render backend URL here
+const API_BASE = "https://snugbear-backend-dosj.onrender.com"; 
+
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
+  
+  const [foundingEntries, setFoundingEntries] = useState([]);
+  const updateOffer = async () => {
+    const newOffer = prompt("Enter the new offer name:");
+    await fetch(`${API_BASE}/api/admin/update-offer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ offer: newOffer })
+    });
+};
 
+// Add a button in your AdminDashboard return:
+<button onClick={updateOffer} className="bg-red-500 text-white p-2 rounded">
+  Update Global Offer
+</button>
+
+const fetchFoundingCircle = async () => {
+    const res = await fetch(`${API_BASE}/api/admin/founding-circle`);
+    const data = await res.json();
+    setFoundingEntries(data);
+};
+
+useEffect(() => {
+    fetchOrders();
+    fetchFoundingCircle(); // Fetch this too
+}, []);
   const fetchOrders = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/admin/orders');
+      const response = await fetch(`${API_BASE}/api/admin/orders`);
       const data = await response.json();
       setOrders(data);
     } catch (error) {
@@ -19,12 +47,16 @@ export default function AdminDashboard() {
   }, []);
 
   const updateStatus = async (orderId, newStatus) => {
-    await fetch(`http://127.0.0.1:5000/api/admin/orders/${orderId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus })
-    });
-    fetchOrders();
+    try {
+      await fetch(`${API_BASE}/api/admin/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      fetchOrders();
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   };
 
   return (
@@ -45,50 +77,90 @@ export default function AdminDashboard() {
           <tbody className="divide-y divide-[#6D442C]/5">
             {orders.map((order) => (
               <React.Fragment key={order.order_id}>
-                <tr className="hover:bg-[#FFF9F6] cursor-pointer" onClick={() => setExpandedOrderId(expandedOrderId === order.order_id ? null : order.order_id)}>
+                <tr 
+                  className="hover:bg-[#FFF9F6] cursor-pointer" 
+                  onClick={() => setExpandedOrderId(expandedOrderId === order.order_id ? null : order.order_id)}
+                >
                   <td className="px-6 py-4 font-mono font-bold text-[#7A6B5C]">{order.order_id}</td>
                   <td className="px-6 py-4">
                     <div className="font-bold text-[#4D3A2A]">{order.name || "N/A"}</div>
                     <div className="text-[10px] text-[#7A6B5C]">{order.email}</div>
                   </td>
-                  <td className="px-6 py-4 font-black text-[#6D442C]">₹{order.total}</td>
+                  <td className="px-6 py-4 font-black text-[#6D442C]">
+                    ₹{order.total ? order.total : "0"}
+                  </td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-orange-100 text-orange-700">
                       {order.status || 'Processing'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <select onClick={(e) => e.stopPropagation()} onChange={(e) => updateStatus(order.order_id, e.target.value)} value={order.status || 'Processing'} className="bg-white border p-1 rounded">
+                    <select 
+                      onClick={(e) => e.stopPropagation()} 
+                      onChange={(e) => updateStatus(order.order_id, e.target.value)} 
+                      value={order.status || 'Processing'} 
+                      className="bg-white border p-1 rounded"
+                    >
                       <option value="Processing">Processing</option>
                       <option value="Shipped">Shipped</option>
                       <option value="Delivered">Delivered</option>
                     </select>
                   </td>
                 </tr>
+                
                 {/* Expanded Details Row */}
-                {expandedOrderId === order.order_id && (
-                  <tr className="bg-[#FFF9F6]">
-                    <td colSpan="5" className="px-6 py-4">
-                      <div className="grid grid-cols-2 gap-4 text-xs">
-                        <div>
-                          <p className="font-bold text-[#4D3A2A]">Shipping Address:</p>
-                          <p className="text-[#7A6B5C] whitespace-pre-line">{order.address || "No address provided"}</p>
-                          <p className="mt-2 font-bold text-[#4D3A2A]">Phone: <span className="font-normal">{order.phone}</span></p>
-                        </div>
-                        <div>
-                          <p className="font-bold text-[#4D3A2A]">Order Items:</p>
-                          {order.items?.map((item, idx) => (
-                            <p key={idx} className="text-[#7A6B5C]">• {item.name} (x{item.quantity}) - {item.selectedSize}</p>
-                          ))}
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                {/* Expanded Details Row */}
+{expandedOrderId === order.order_id && (
+  <tr className="bg-[#FFF9F6]">
+    <td colSpan="5" className="px-6 py-4">
+      <div className="grid grid-cols-2 gap-4 text-xs">
+        <div>
+          <p className="font-bold text-[#4D3A2A]">Shipping Address:</p>
+          <p className="text-[#7A6B5C]">{order.address || "No address"}</p>
+          <p className="mt-2 font-bold text-[#4D3A2A]">Phone: <span className="font-normal">{order.phone}</span></p>
+        </div>
+        
+        {/* FIXED: Targeting order.cart instead of order.items */}
+        <div>
+          <p className="font-bold text-[#4D3A2A]">Order Items:</p>
+          {order.cart?.map((item, idx) => (
+            <p key={idx} className="text-[#7A6B5C]">
+              • {item.name} (x{item.quantity}) - ₹{item.price * item.quantity}
+            </p>
+          ))}
+          <p className="mt-2 font-black text-[#6D442C]">
+            Total Amount: ₹{order.total || 0}
+          </p>
+        </div>
+      </div>
+    </td>
+  </tr>
+)}
               </React.Fragment>
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* --- ADD THE FOUNDING CIRCLE SECTION HERE --- */}
+      <div className="bg-white p-8 rounded-3xl border border-[#6D442C]/10 shadow-sm">
+        <h2 className="text-2xl font-black text-[#4D3A2A] mb-4">Founding Circle Entries</h2>
+        
+        {/* Counter */}
+        <div className="font-bold text-lg mb-4 text-[#6D442C]">
+          Total Entries: {foundingEntries.length} / 50
+        </div>
+
+        {/* List of Entries */}
+        <div className="space-y-2">
+          {foundingEntries.slice(0, 50).map((entry, idx) => (
+            <div key={idx} className={`border-b py-3 px-4 rounded-xl text-sm ${idx < 50 ? "bg-green-50" : "bg-gray-50"}`}>
+              <span className="font-bold text-[#4D3A2A]">{idx + 1}. {entry.email}</span> 
+              <span className="text-[#7A6B5C] ml-4">Order ID: {entry.order_id}</span>
+              <span className="text-[#7A6B5C] ml-4">IG: {entry.instagram}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

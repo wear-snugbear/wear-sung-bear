@@ -1,16 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PageGlow from "../../components/PageGlow/PageGlow";
+import { useNavigate } from "react-router-dom";
 
 export default function Community() {
   const [email, setEmail] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [entryCount, setEntryCount] = useState(0); // Added for progress bar
+  const [formData, setFormData] = useState({ order_id: '', email: '', instagram: '' });
+  const navigate = useNavigate();
+  const API_BASE = "https://snugbear-backend-dosj.onrender.com";
 
-  const handleFoundingCircleSignup = (e) => {
-    e.preventDefault();
-    // Logic: In a real app, send this to your MongoDB
-    setFormSubmitted(true);
-  };
+  
+
+  const handleFoundingCircleSignup = async (e) => {
+  e.preventDefault();
+  try {
+    // Remove this entirely
+// useEffect(() => { ... }, []);
+
+// In your handleFoundingCircleSignup, ensure you are using the full URL:
+const response = await fetch("https://snugbear-backend-dosj.onrender.com/api/community/founding-circle", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(formData),
+});
+
+    if (response.ok) {
+      setFormSubmitted(true);
+      setTimeout(() => navigate("/founding-circle"), 1000);
+    } else {
+      console.error("Server responded with:", response.status);
+    }
+  } catch (error) {
+    console.error("Network or CORS error:", error);
+  }
+};
 
   return (
     <div className="relative min-h-screen bg-[#FFFBF9] text-[#6D442C]">
@@ -36,12 +61,19 @@ export default function Community() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-2xl font-bold font-serif mb-4">Limited Offer: Free Article!</h2>
+              {/* --- ADD PROGRESS BAR HERE --- */}
+
+    <p className="text-xs text-center mt-2 font-bold text-[#6D442C]">
+      {entryCount} / 50 spots filled!
+    </p>
+  </div>
+  {/* ----------------------------- */}
               <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-                As a thank you to our founding members, the first 50 customers who purchase, post a reel on Instagram, and fill out this form will receive <strong>one exclusive article</strong> from our collection—on us!
+                As a thank you to our founding members, the first 50 customers who purchase, post a reel on Instagram, and fill out this form will receive <strong>one moody collection article</strong> from our collection—on us!
               </p>
               
               <div className="space-y-4">
-                {['1. Purchase your favorite Snuggles', '2. Share a reel on Instagram tagging us', '3. Submit your details below'].map((step, i) => (
+                {['1. Purchase your favorite Snuggies', '2. Share how your bear made you feel today on your socials', '3. Submit your details'].map((step, i) => (
                   <div key={i} className="flex items-center gap-3 text-sm font-bold text-[#6D442C]">
                     <div className="w-6 h-6 rounded-full bg-[#FF8580] text-white flex items-center justify-center text-[10px]">{i + 1}</div>
                     {step}
@@ -59,9 +91,30 @@ export default function Community() {
                 </div>
               ) : (
                 <form onSubmit={handleFoundingCircleSignup} className="space-y-4">
-                  <input required placeholder="Your Order ID" className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" />
-                  <input type="email" required placeholder="Email Address" className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" />
-                  <input placeholder="Instagram Handle (@...)" className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" />
+                  <input 
+  required 
+  name="order_id" // ADD THIS
+  value={formData.order_id} // ADD THIS
+  onChange={(e) => setFormData({...formData, order_id: e.target.value})} // ADD THIS
+  placeholder="Your Order ID" 
+  className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" 
+/>
+<input 
+  type="email" 
+  required 
+  name="email" // ADD THIS
+  value={formData.email} // ADD THIS
+  onChange={(e) => setFormData({...formData, email: e.target.value})} // ADD THIS
+  placeholder="Email Address" 
+  className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" 
+/>
+<input 
+  name="instagram" // ADD THIS
+  value={formData.instagram} // ADD THIS
+  onChange={(e) => setFormData({...formData, instagram: e.target.value})} // ADD THIS
+  placeholder="Instagram Handle (@...)" 
+  className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" 
+/>
                   <button className="w-full py-3 bg-[#6D442C] text-white rounded-xl font-bold text-sm hover:bg-[#4D3A2A] transition-all">
                     JOIN THE CIRCLE
                   </button>

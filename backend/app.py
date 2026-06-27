@@ -74,7 +74,6 @@ def get_products():
 
 @app.route('/api/checkout', methods=['POST', 'OPTIONS'])
 def checkout():
-    # Handle preflight
     if request.method == "OPTIONS":
         return jsonify({}), 200
         
@@ -82,7 +81,11 @@ def checkout():
     if not order:
         return jsonify({"error": "No data provided"}), 400
 
-    # Generate tracking ID and system fields
+    # Calculate total
+    # In app.py - inside the checkout route
+    if 'total' not in order or order['total'] == 0:
+        order['total'] = sum(float(item.get('price', 0)) * int(item.get('quantity', 1)) for item in order.get('cart', []))
+    
     order['order_id'] = str(uuid.uuid4())[:8]
     order['status'] = 'Processing'
     order['created_at'] = datetime.now(timezone.utc)
@@ -93,13 +96,13 @@ def checkout():
     except Exception as e:
         return jsonify({"error": "Database error"}), 500
     
-    # Send Email (This will now run every time)
+    # --- ADD THIS BACK: Trigger the email function ---
     try:
         send_order_confirmation(order.get('email'), order['order_id'])
     except Exception as e:
         print(f"Email failed, but order saved: {e}")
+    # --------------------------------------------------
     
-    # Return the tracking ID to the frontend
     return jsonify({"message": "Order created!", "tracking_id": order['order_id']}), 201
 
 @app.route('/api/orders/<email>', methods=['GET'])
@@ -119,6 +122,49 @@ def update_order(order_id):
     if result.modified_count > 0:
         return jsonify({"message": "Status updated"}), 200
     return jsonify({"error": "Order not found"}), 404
+
+# Route to submit the form
+@app.route('/api/community/founding-circle', methods=['POST', 'OPTIONS'])
+def founding_circle():
+    # This specifically handles the browser "preflight" check
+    if request.method == "OPTIONS":
+        response = jsonify({})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+        response.headers.add("Access-Control-Allow-Methods", "POST")
+        return response, 200
+
+    data = request.json
+    if not data or not data.get('order_id') or not data.get('email'):
+        return jsonify({"error": "Missing details"}), 400
+    
+    try:
+        db.founding_circle.insert_one({
+            "order_id": data['order_id'],
+            "email": data['email'],
+            "instagram": data.get('instagram', ''),
+            "submitted_at": datetime.now(timezone.utc)
+        })
+        return jsonify({"message": "Successfully joined!"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# # Route for Admin to see the entries
+# @app.route('/api/admin/founding-circle', methods=['GET'])
+# def get_founding_circle():
+#     entries = list(db.founding_circle.find({}, {'_id': 0}).sort("submitted_at", 1))
+#     return jsonify(entries)
+
+@app.route('/api/offers', methods=['GET'])
+def get_current_offer():
+    # Adding {'_id': 0} ensures it doesn't break JSON serialization
+    offer = db.offers.find_one({"is_active": True}, {'_id': 0})
+    
+    # Handle case where no offer is found
+    if not offer:
+        return jsonify({"active_offer": "No active offers", "description": "Check back later!"}), 404
+        
+    return jsonify(offer)
 
 if __name__ == '__main__':
     # Render will provide a PORT environment variable. 
