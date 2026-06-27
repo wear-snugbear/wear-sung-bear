@@ -1,48 +1,44 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import PageGlow from "../../components/PageGlow/PageGlow";
 import { useNavigate } from "react-router-dom";
 
 export default function Community() {
-  const [email, setEmail] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [entryCount, setEntryCount] = useState(0); // Added for progress bar
   const [formData, setFormData] = useState({ order_id: '', email: '', instagram: '' });
   const navigate = useNavigate();
+
+  // Use your production backend URL
   const API_BASE = "https://snugbear-backend-dosj.onrender.com";
 
-  
-
   const handleFoundingCircleSignup = async (e) => {
-  e.preventDefault();
-  try {
-    // Remove this entirely
-// useEffect(() => { ... }, []);
+    e.preventDefault();
+    try {
+      const response = await fetch(`${API_BASE}/api/community/founding-circle`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-// In your handleFoundingCircleSignup, ensure you are using the full URL:
-const response = await fetch("https://snugbear-backend-dosj.onrender.com/api/community/founding-circle", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(formData),
-});
-
-    if (response.ok) {
-      setFormSubmitted(true);
-      setTimeout(() => navigate("/founding-circle"), 1000);
-    } else {
-      console.error("Server responded with:", response.status);
+      if (response.ok) {
+        setFormSubmitted(true);
+        setTimeout(() => navigate("/founding-circle"), 1000);
+      } else {
+        const errorData = await response.json();
+        console.error("Server responded with:", errorData);
+        alert("Submission failed. Please check your details.");
+      }
+    } catch (error) {
+      console.error("Network or CORS error:", error);
+      alert("Network error. Please try again later.");
     }
-  } catch (error) {
-    console.error("Network or CORS error:", error);
-  }
-};
+  };
 
   return (
     <div className="relative min-h-screen bg-[#FFFBF9] text-[#6D442C]">
       <PageGlow />
 
       <div className="relative z-10 mx-auto max-w-5xl px-6 py-20">
-        
         {/* 1. Header Section */}
         <div className="text-center mb-16">
           <motion.h1 
@@ -61,13 +57,6 @@ const response = await fetch("https://snugbear-backend-dosj.onrender.com/api/com
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-2xl font-bold font-serif mb-4">Limited Offer: Free Article!</h2>
-              {/* --- ADD PROGRESS BAR HERE --- */}
-
-    <p className="text-xs text-center mt-2 font-bold text-[#6D442C]">
-      {entryCount} / 50 spots filled!
-    </p>
-  </div>
-  {/* ----------------------------- */}
               <p className="text-sm text-gray-600 mb-6 leading-relaxed">
                 As a thank you to our founding members, the first 50 customers who purchase, post a reel on Instagram, and fill out this form will receive <strong>one moody collection article</strong> from our collection—on us!
               </p>
@@ -92,29 +81,26 @@ const response = await fetch("https://snugbear-backend-dosj.onrender.com/api/com
               ) : (
                 <form onSubmit={handleFoundingCircleSignup} className="space-y-4">
                   <input 
-  required 
-  name="order_id" // ADD THIS
-  value={formData.order_id} // ADD THIS
-  onChange={(e) => setFormData({...formData, order_id: e.target.value})} // ADD THIS
-  placeholder="Your Order ID" 
-  className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" 
-/>
-<input 
-  type="email" 
-  required 
-  name="email" // ADD THIS
-  value={formData.email} // ADD THIS
-  onChange={(e) => setFormData({...formData, email: e.target.value})} // ADD THIS
-  placeholder="Email Address" 
-  className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" 
-/>
-<input 
-  name="instagram" // ADD THIS
-  value={formData.instagram} // ADD THIS
-  onChange={(e) => setFormData({...formData, instagram: e.target.value})} // ADD THIS
-  placeholder="Instagram Handle (@...)" 
-  className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" 
-/>
+                    required 
+                    value={formData.order_id} 
+                    onChange={(e) => setFormData({...formData, order_id: e.target.value})} 
+                    placeholder="Your Order ID" 
+                    className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" 
+                  />
+                  <input 
+                    type="email" 
+                    required 
+                    value={formData.email} 
+                    onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                    placeholder="Email Address" 
+                    className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" 
+                  />
+                  <input 
+                    value={formData.instagram} 
+                    onChange={(e) => setFormData({...formData, instagram: e.target.value})} 
+                    placeholder="Instagram Handle (@...)" 
+                    className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 text-sm" 
+                  />
                   <button className="w-full py-3 bg-[#6D442C] text-white rounded-xl font-bold text-sm hover:bg-[#4D3A2A] transition-all">
                     JOIN THE CIRCLE
                   </button>
@@ -138,7 +124,6 @@ const response = await fetch("https://snugbear-backend-dosj.onrender.com/api/com
             </div>
           ))}
         </div>
-
       </div>
     </div>
   );

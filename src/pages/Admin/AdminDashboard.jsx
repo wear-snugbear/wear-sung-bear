@@ -6,8 +6,18 @@ const API_BASE = "https://snugbear-backend-dosj.onrender.com";
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [claimedGifts, setClaimedGifts] = useState([]);
   
   const [foundingEntries, setFoundingEntries] = useState([]);
+  const fetchClaimedGifts = async () => {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/claimed-gifts`);
+        const data = await res.json();
+        setClaimedGifts(data);
+    } catch (err) {
+        console.error("Error fetching claimed gifts:", err);
+    }
+};
   const updateOffer = async () => {
     const newOffer = prompt("Enter the new offer name:");
     await fetch(`${API_BASE}/api/admin/update-offer`, {
@@ -27,10 +37,10 @@ const fetchFoundingCircle = async () => {
     const data = await res.json();
     setFoundingEntries(data);
 };
-
 useEffect(() => {
     fetchOrders();
-    fetchFoundingCircle(); // Fetch this too
+    fetchFoundingCircle();
+    fetchClaimedGifts(); // Add this
 }, []);
   const fetchOrders = async () => {
     try {
@@ -145,6 +155,32 @@ useEffect(() => {
       {/* --- ADD THE FOUNDING CIRCLE SECTION HERE --- */}
       <div className="bg-white p-8 rounded-3xl border border-[#6D442C]/10 shadow-sm">
         <h2 className="text-2xl font-black text-[#4D3A2A] mb-4">Founding Circle Entries</h2>
+        {/* --- NEW: Claimed Gifts Section --- */}
+<div className="bg-white p-8 mt-8 rounded-3xl border border-[#6D442C]/10 shadow-sm">
+  <h2 className="text-2xl font-black text-[#4D3A2A] mb-4">🎁 Claimed Moody Gifts</h2>
+  <div className="overflow-x-auto">
+    <table className="w-full text-left text-sm">
+      <thead className="text-[#6D442C] uppercase font-bold text-xs border-b">
+        <tr>
+          <th className="px-4 py-2">Email</th>
+          <th className="px-4 py-2">Product Won</th>
+          <th className="px-4 py-2">Time Claimed</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y">
+        {claimedGifts.map((gift, idx) => (
+          <tr key={idx}>
+            <td className="px-4 py-3 text-[#4D3A2A] font-bold">{gift.email}</td>
+            <td className="px-4 py-3 text-[#FF8580] font-bold">{gift.productName}</td>
+            <td className="px-4 py-3 text-[#7A6B5C]">
+              {new Date(gift.claimed_at).toLocaleString()}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
         
         {/* Counter */}
         <div className="font-bold text-lg mb-4 text-[#6D442C]">

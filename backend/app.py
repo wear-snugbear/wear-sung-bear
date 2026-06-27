@@ -166,6 +166,42 @@ def get_current_offer():
         
     return jsonify(offer)
 
+@app.route('/api/claim-gift', methods=['POST', 'OPTIONS'])
+def claim_gift():
+    # 1. Handle CORS Preflight
+    if request.method == "OPTIONS":
+        response = jsonify({})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+        response.headers.add("Access-Control-Allow-Methods", "POST")
+        return response, 200
+
+    # 2. Handle POST Request
+    data = request.json
+    if not data or 'email' not in data or 'productName' not in data:
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    try:
+        db.claimed_gifts.insert_one({
+            "email": data['email'],
+            "productName": data['productName'],
+            "productId": data.get('productId', 'N/A'),
+            "claimed_at": datetime.now(timezone.utc),
+            "status": "Gift Claimed"
+        })
+        # Explicitly set headers on success
+        response = jsonify({"message": "Gift claimed successfully!"})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response, 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/admin/claimed-gifts', methods=['GET'])
+def get_claimed_gifts():
+    # Retrieves all documents from the 'claimed_gifts' collection
+    gifts = list(db.claimed_gifts.find({}, {'_id': 0}).sort("claimed_at", -1))
+    return jsonify(gifts)
+
 if __name__ == '__main__':
     # Render will provide a PORT environment variable. 
     # If not provided (like when running locally), default to 5000.
