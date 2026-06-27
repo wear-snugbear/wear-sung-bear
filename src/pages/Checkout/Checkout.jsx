@@ -5,105 +5,95 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Checkout() {
   const { cart } = useCart();
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [loading, setLoading] = useState(false);
-  const [statusMsg, setStatusMsg] = useState("");
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleProceedToPayment = async () => {
-    console.log("Button clicked, starting process...");
-
-    if (!formData.name || !formData.email || !formData.address) {
-      alert("Please fill in all required fields.");
+    if (!formData.name || !formData.email || !formData.address || !paymentMethod) {
+      alert("Please complete all details and select a payment method.");
       return;
     }
 
     setLoading(true);
-    setStatusMsg("Connecting to server...");
-
-    // DEFINE THESE MISSING VARIABLES
-    const orderData = { ...formData, cart }; 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300000); 
+    const orderData = { ...formData, cart, paymentMethod };
 
     try {
-      const response = await fetch("https://snugbear-backend.onrender.com/api/checkout", {
+      const response = await fetch("http://localhost:5000/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
-        signal: controller.signal
       });
 
-      clearTimeout(timeoutId);
-
-      if (!response.ok) throw new Error(`Server responded with ${response.status}`);
-      
       const result = await response.json();
-      alert("Order placed successfully!");
-      console.log("Success:", result);
-    } catch (error) {
-      console.error("DEBUG ERROR:", error);
+      if (!response.ok) throw new Error(result.error);
       
-      if (error.name === 'AbortError') {
-        setStatusMsg("Server took too long to wake up. Please try again.");
-      } else {
-        setStatusMsg("Connection failed. Check your network.");
-      }
+      alert(`Success! Your Tracking ID: ${result.tracking_id}`);
+    } catch (error) {
+      alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFBF9] py-12 px-4 flex justify-center">
+    <div className="min-h-screen bg-[#FFFBF9] py-12 px-4 flex justify-center items-start">
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white p-8 rounded-3xl border border-[#6D442C]/10 shadow-lg"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+        className="max-w-md w-full bg-white p-8 rounded-3xl border border-gray-100 shadow-xl"
       >
-        <h2 className="font-serif text-2xl font-black text-[#4D3A2A] mb-1">Final Snuggles 🧸</h2>
-        <p className="text-xs text-[#7A6B5C] font-bold mb-6 tracking-wide uppercase">Fill in your delivery details</p>
+        <h2 className="font-serif text-3xl font-bold text-[#4D3A2A] mb-2">Checkout</h2>
+        <p className="text-sm text-gray-500 mb-8">Almost there! Just a few details left.</p>
 
-        <div className="space-y-4">
-          {['name', 'email', 'phone'].map((field) => (
-            <input 
-              key={field}
-              name={field}
-              type={field === 'email' ? 'email' : 'text'}
-              placeholder={field.charAt(0).toUpperCase() + field.slice(1)} 
-              onChange={handleInputChange} 
-              className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 bg-[#FFF9F6] focus:border-[#FF8580] outline-none transition-all placeholder:text-[#7A6B5C]/50 text-sm font-bold" 
-            />
-          ))}
-          <textarea 
-            name="address" 
-            placeholder="Delivery Address" 
-            onChange={handleInputChange} 
-            className="w-full px-4 py-3 rounded-xl border border-[#6D442C]/10 bg-[#FFF9F6] focus:border-[#FF8580] outline-none transition-all placeholder:text-[#7A6B5C]/50 text-sm font-bold h-24 resize-none" 
-          />
+        {/* Order Summary Summary */}
+        <div className="bg-[#FFF9F6] p-4 rounded-2xl mb-6 border border-[#6D442C]/5">
+            <p className="text-xs font-bold text-[#6D442C] uppercase tracking-wider mb-1">Your Order Summary</p>
+            <p className="text-sm font-semibold text-gray-700">{cart.length} items waiting for you.</p>
         </div>
 
-        <AnimatePresence>
-          {loading && (
-            <motion.p 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="mt-4 text-[10px] text-center font-bold text-[#6D442C] animate-pulse"
-            >
-              {statusMsg}
-            </motion.p>
-          )}
-        </AnimatePresence>
+        {/* Delivery Form */}
+        <div className="space-y-4 mb-8">
+          {['name', 'email', 'phone'].map((field) => (
+            <div key={field}>
+                <label className="text-[10px] uppercase font-bold text-gray-400 ml-1">{field}</label>
+                <input name={field} type={field === 'email' ? 'email' : 'text'} onChange={handleInputChange} 
+                   className="w-full px-4 py-3 mt-1 rounded-xl border border-gray-200 focus:border-[#6D442C] outline-none transition-all text-sm font-medium" />
+            </div>
+          ))}
+          <div>
+            <label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Delivery Address</label>
+            <textarea name="address" onChange={handleInputChange} 
+                    className="w-full px-4 py-3 mt-1 rounded-xl border border-gray-200 focus:border-[#6D442C] outline-none transition-all text-sm font-medium h-20 resize-none" />
+          </div>
+        </div>
+
+        {/* Payment Methods */}
+        <div className="mb-8">
+          <p className="text-xs font-bold text-gray-400 mb-3 uppercase">Payment Method</p>
+          <div className="grid grid-cols-2 gap-3">
+            {['UPI', 'COD'].map((method) => (
+              <button key={method} onClick={() => setPaymentMethod(method)}
+                className={`py-3 rounded-xl border font-bold text-sm transition-all ${
+                  paymentMethod === method ? "border-[#6D442C] bg-[#6D442C] text-white" : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                {method}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <button 
           onClick={handleProceedToPayment}
           disabled={loading}
-          className={`w-full mt-6 py-4 rounded-2xl font-black tracking-widest text-sm transition-all shadow-md ${
-            loading ? "bg-[#A38B78] cursor-not-allowed" : "bg-[#6D442C] hover:bg-[#4D3A2A]"
+          className={`w-full py-4 rounded-2xl font-bold text-sm tracking-wide transition-all shadow-lg ${
+            loading ? "bg-gray-300" : "bg-[#4D3A2A] hover:bg-[#2e2319]"
           } text-white`}
         >
-          {loading ? "PROCESSING..." : "PROCEED TO PAYMENT ✨"}
+          {loading ? "PROCESSING..." : "CONFIRM & PAY"}
         </button>
       </motion.div>
     </div>
