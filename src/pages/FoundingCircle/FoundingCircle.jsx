@@ -14,8 +14,7 @@ export default function FoundingCircle() {
       .then((res) => res.json())
       .then((data) => {
         setMoodyItems(data.filter((i) => i.collectionName === "Moody Collection"));
-      })
-      .catch((err) => console.error("Fetch error:", err));
+      });
   }, []);
 
   const handleClaimGift = async () => {
@@ -28,14 +27,16 @@ export default function FoundingCircle() {
         body: JSON.stringify({
           email: email,
           productName: randomItem.name,
-          productId: randomItem.id || "N/A"
+          productId: randomItem.id || "N/A",
+          // Adding these ensures the backend knows it's a Founding Circle entry
+          isFoundingCircle: true 
         })
       });
       
       if (response.ok) {
         alert("Yay! Your gift is secured! 🧸");
       } else {
-        alert("Something went wrong. Please try again.");
+        alert("Server error. Please try again.");
       }
     } catch (error) {
       console.error("Submission error:", error);
@@ -48,8 +49,6 @@ export default function FoundingCircle() {
       const random = moodyItems[Math.floor(Math.random() * moodyItems.length)];
       setRandomItem(random);
       setGiftOpened(true);
-    } else {
-      alert("No gifts available right now!");
     }
   };
 
@@ -57,33 +56,31 @@ export default function FoundingCircle() {
     <div className="min-h-screen bg-[#FFFBF9] flex items-center justify-center p-6">
       <AnimatePresence mode="wait">
         {!giftOpened ? (
-          <motion.div key="gift" className="text-center" exit={{ opacity: 0 }}>
+          <motion.div key="gift" className="text-center">
             <motion.div whileHover={{ scale: 1.1 }} onClick={handleOpenGift} className="cursor-pointer text-[120px]">🎁</motion.div>
-            <h2 className="text-[#6D442C] font-black text-2xl mt-4">Click to Open Your Gift!</h2>
+            <h2 className="text-[#6D442C] font-black text-2xl mt-4">Click to reveal your surprise!</h2>
           </motion.div>
         ) : (
           <motion.div 
             key="reveal" 
             initial={{ opacity: 0, scale: 0.9 }} 
             animate={{ opacity: 1, scale: 1 }} 
-            className="bg-white p-8 rounded-[2rem] shadow-2xl border-2 border-[#FF8580]/30 text-center max-w-sm w-full"
+            className="bg-white p-8 rounded-3xl shadow-2xl border-2 border-[#FF8580]/30 text-center max-w-sm w-full"
           >
-            {randomItem?.image && (
-              <img src={randomItem.image} alt="Gift" className="w-40 h-40 mx-auto rounded-2xl mb-4 object-cover shadow-md" />
-            )}
+            {randomItem?.image && <img src={randomItem.image} className="w-32 h-32 mx-auto rounded-2xl mb-4" />}
             <h3 className="text-2xl font-black text-[#6D442C] mb-2">{randomItem?.name}</h3>
-            <p className="text-[#7A6B5C] mb-6 text-sm">{randomItem?.description}</p>
+            <p className="text-gray-500 mb-6 text-sm">{randomItem?.description}</p>
             
             <input 
               type="email"
               placeholder="Enter your email to claim" 
-              className="w-full p-3 mb-4 rounded-xl border border-[#FF8580]/20 focus:outline-none focus:ring-2 focus:ring-[#FF8580]"
+              className="w-full p-3 mb-4 rounded-xl border border-gray-200"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             
-            <button onClick={handleClaimGift} className="w-full bg-[#6D442C] text-white py-3 rounded-full font-bold shadow-lg hover:bg-[#FF8580] transition-all">
-              Claim My Gift
+            <button onClick={handleClaimGift} className="w-full bg-[#FF8580] text-white py-3 rounded-full font-bold shadow-lg hover:bg-[#6D442C] transition">
+              Claim Gift
             </button>
           </motion.div>
         )}

@@ -168,31 +168,30 @@ def get_current_offer():
 
 @app.route('/api/claim-gift', methods=['POST', 'OPTIONS'])
 def claim_gift():
-    # 1. Handle CORS Preflight
     if request.method == "OPTIONS":
         response = jsonify({})
         response.headers.add("Access-Control-Allow-Origin", "*")
         response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        response.headers.add("Access-Control-Allow-Methods", "POST")
         return response, 200
 
-    # 2. Handle POST Request
     data = request.json
-    if not data or 'email' not in data or 'productName' not in data:
-        return jsonify({"error": "Missing required fields"}), 400
-    
     try:
+        # 1. Save to claimed_gifts
         db.claimed_gifts.insert_one({
             "email": data['email'],
             "productName": data['productName'],
             "productId": data.get('productId', 'N/A'),
-            "claimed_at": datetime.now(timezone.utc),
-            "status": "Gift Claimed"
+            "claimed_at": datetime.now(timezone.utc)
         })
-        # Explicitly set headers on success
-        response = jsonify({"message": "Gift claimed successfully!"})
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        return response, 201
+        
+        # 2. ALSO save to founding_circle so your dashboard count updates
+        db.founding_circle.insert_one({
+            "email": data['email'],
+            "order_id": "Gift-Claimed", 
+            "submitted_at": datetime.now(timezone.utc)
+        })
+        
+        return jsonify({"message": "Success"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -201,6 +200,12 @@ def get_claimed_gifts():
     # Retrieves all documents from the 'claimed_gifts' collection
     gifts = list(db.claimed_gifts.find({}, {'_id': 0}).sort("claimed_at", -1))
     return jsonify(gifts)
+
+# Route for Admin to see the entries
+@app.route('/api/admin/founding-circle', methods=['GET'])
+def get_founding_circle():
+    entries = list(db.founding_circle.find({}, {'_id': 0}).sort("submitted_at", 1))
+    return jsonify(entries)
 
 if __name__ == '__main__':
     # Render will provide a PORT environment variable. 

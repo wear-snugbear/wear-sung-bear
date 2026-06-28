@@ -33,9 +33,13 @@ export default function AdminDashboard() {
 </button>
 
 const fetchFoundingCircle = async () => {
-    const res = await fetch(`${API_BASE}/api/admin/founding-circle`);
-    const data = await res.json();
-    setFoundingEntries(data);
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/founding-circle`);
+        const data = await res.json();
+        setFoundingEntries(data); // This updates the UI!
+    } catch (err) {
+        console.error("Error:", err);
+    }
 };
 useEffect(() => {
     fetchOrders();
@@ -69,8 +73,20 @@ useEffect(() => {
     }
   };
 
+  const deleteOldOrders = async () => {
+    if (window.confirm("Are you sure you want to delete all orders older than 30 days?")) {
+        const response = await fetch(`${API_BASE}/api/admin/delete-old-orders`, {
+            method: 'DELETE'
+        });
+        const data = await response.json();
+        alert(data.message);
+        fetchOrders(); // Refresh the order list
+    }
+  };
+
   return (
     <div className="p-8 bg-[#FFFBF9] min-h-screen">
+      
       <h1 className="text-3xl font-black text-[#4D3A2A] mb-8">Order Management 🧸</h1>
       
       <div className="bg-white rounded-3xl border border-[#6D442C]/10 shadow-sm overflow-hidden">
@@ -152,51 +168,52 @@ useEffect(() => {
         </table>
       </div>
 
-      {/* --- ADD THE FOUNDING CIRCLE SECTION HERE --- */}
-      <div className="bg-white p-8 rounded-3xl border border-[#6D442C]/10 shadow-sm">
-        <h2 className="text-2xl font-black text-[#4D3A2A] mb-4">Founding Circle Entries</h2>
-        {/* --- NEW: Claimed Gifts Section --- */}
-<div className="bg-white p-8 mt-8 rounded-3xl border border-[#6D442C]/10 shadow-sm">
-  <h2 className="text-2xl font-black text-[#4D3A2A] mb-4">🎁 Claimed Moody Gifts</h2>
-  <div className="overflow-x-auto">
-    <table className="w-full text-left text-sm">
-      <thead className="text-[#6D442C] uppercase font-bold text-xs border-b">
-        <tr>
-          <th className="px-4 py-2">Email</th>
-          <th className="px-4 py-2">Product Won</th>
-          <th className="px-4 py-2">Time Claimed</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y">
-        {claimedGifts.map((gift, idx) => (
-          <tr key={idx}>
-            <td className="px-4 py-3 text-[#4D3A2A] font-bold">{gift.email}</td>
-            <td className="px-4 py-3 text-[#FF8580] font-bold">{gift.productName}</td>
-            <td className="px-4 py-3 text-[#7A6B5C]">
-              {new Date(gift.claimed_at).toLocaleString()}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
-        
-        {/* Counter */}
-        <div className="font-bold text-lg mb-4 text-[#6D442C]">
-          Total Entries: {foundingEntries.length} / 50
+      <div className="bg-white p-8 mt-10 rounded-3xl border border-[#6D442C]/10 shadow-lg">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-3xl font-black text-[#4D3A2A]">Founding Circle</h2>
+            <p className="text-[#6D442C] font-bold text-lg">
+              Entries: {foundingEntries.length} / 50
+            </p>
+          </div>
+          <button 
+            onClick={async () => {
+              if(window.confirm("Reset the cycle? This will delete all current entries!")) {
+                  await fetch(`${API_BASE}/api/admin/reset-founding-circle`, { method: 'DELETE' });
+                  fetchFoundingCircle();
+              }
+            }}
+            className="bg-red-500 text-white px-6 py-2 rounded-full font-bold hover:bg-red-600 transition"
+          >
+            Reset Cycle
+          </button>
         </div>
 
-        {/* List of Entries */}
-        <div className="space-y-2">
+        {/* Progress Bar */}
+        <div className="w-full bg-gray-100 rounded-full h-4 mb-8 overflow-hidden">
+          <div 
+            className="bg-[#6D442C] h-full transition-all duration-500" 
+            style={{ width: `${Math.min((foundingEntries.length / 50) * 100, 100)}%` }}
+          />
+        </div>
+
+        {/* Entries List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {foundingEntries.slice(0, 50).map((entry, idx) => (
-            <div key={idx} className={`border-b py-3 px-4 rounded-xl text-sm ${idx < 50 ? "bg-green-50" : "bg-gray-50"}`}>
-              <span className="font-bold text-[#4D3A2A]">{idx + 1}. {entry.email}</span> 
-              <span className="text-[#7A6B5C] ml-4">Order ID: {entry.order_id}</span>
-              <span className="text-[#7A6B5C] ml-4">IG: {entry.instagram}</span>
+            <div key={idx} className="flex items-center gap-3 p-3 bg-[#FFF9F6] rounded-xl border border-[#6D442C]/5">
+              <div className="w-8 h-8 rounded-full bg-[#6D442C] text-white flex items-center justify-center font-bold text-xs">
+                {idx + 1}
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#4D3A2A]">{entry.email}</p>
+                <p className="text-[10px] text-[#7A6B5C]">Order: {entry.order_id}</p>
+              </div>
             </div>
           ))}
         </div>
+        <button onClick={() => { fetchFoundingCircle(); fetchClaimedGifts(); }} className="...">
+  Refresh Data
+</button>
       </div>
     </div>
   );
