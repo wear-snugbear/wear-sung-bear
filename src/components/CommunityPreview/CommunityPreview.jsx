@@ -6,9 +6,6 @@ import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-import basicsImg from "../../assets/images/basics.png";
-import moodyImg from "../../assets/images/moody.png";
-import deluluImg from "../../assets/images/delulu.png";
 
 export default function CollectionsPreview() {
   const [cuteEffects, setCuteEffects] = useState([]);
@@ -36,7 +33,7 @@ export default function CollectionsPreview() {
     {
       id: "basics",
       title: "SnugBear Basics",
-      image: basicsImg,
+      image: "/images/basics.png", // UPDATED PATH
       description: ["Minimal aesthetic", "Organic textures"],
       badge: "Core Line",
       bg: "bg-white",
@@ -47,7 +44,7 @@ export default function CollectionsPreview() {
     {
       id: "moody",
       title: "Moody Collection",
-      image: moodyImg,
+      image: "/images/moody.png", // UPDATED PATH
       description: ["Deep emotional tones", "Expressive fit"],
       badge: "Trending",
       bg: "bg-white",
@@ -58,7 +55,7 @@ export default function CollectionsPreview() {
     {
       id: "delulu",
       title: "Delulu Diaries",
-      image: deluluImg,
+      image: "/images/delulu.png", // UPDATED PATH
       description: ["Pastel clouds", "Dreamy vibes"],
       badge: "Coming Soon",
       isComingSoon: true,

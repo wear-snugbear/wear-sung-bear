@@ -1,9 +1,7 @@
 import { useState } from "react";
 
 // 🐻 IMPORT YOUR BRAND GRAPHICS/MODEL IMAGES HERE
-// You can use your existing assets or lifestyle photographs
-import storyImg1 from "../../assets/images/daydream_bloom.png";
-import storyImg2 from "../../assets/images/creamy_beary.png";
+
 
 export default function FounderStory() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,32 +19,35 @@ export default function FounderStory() {
         {/* Left Side: Creative Overlapping Photo Layout */}
         <div className="lg:col-span-5 flex justify-center items-center relative h-[380px] sm:h-[440px]">
           {/* Main Polaroid Image */}
-          <div className="absolute z-10 bg-white p-3 pb-10 rounded-xl shadow-md border border-[#6D442C]/10 rotate-[-4deg] w-[220px] sm:w-[250px] transition-transform duration-300 hover:rotate-0 hover:scale-105">
-            <div className="aspect-[4/5] w-full overflow-hidden rounded-lg bg-[#F7F2EF]">
-              <img 
-                src={storyImg1} 
-                alt="SnugBear Aesthetic Look" 
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <p className="font-serif text-center text-xs text-[#7A6B5C] mt-3 tracking-wide">
-              made with love ♥
-            </p>
-          </div>
+          {/* Main Polaroid Image */}
+<div className="absolute z-10 bg-white p-3 pb-10 rounded-xl shadow-md border border-[#6D442C]/10 rotate-[-4deg] w-[220px] sm:w-[250px] transition-transform duration-300 hover:rotate-0 hover:scale-105">
+  <div className="aspect-[4/5] w-full overflow-hidden rounded-lg bg-[#F7F2EF]">
+    <img 
+      src="/images/daydream_bloom.png" 
+      loading="lazy" 
+      alt="SnugBear Aesthetic Look" 
+      className="h-full w-full object-cover"
+    />
+  </div>
+  <p className="font-serif text-center text-xs text-[#7A6B5C] mt-3 tracking-wide">
+    made with love ♥
+  </p>
+</div>
 
-          {/* Secondary Overlapping Polaroid */}
-          <div className="absolute z-0 bg-white p-3 pb-8 rounded-xl shadow-sm border border-[#6D442C]/5 rotate-[6deg] translate-x-24 translate-y-12 w-[180px] sm:w-[200px] transition-transform duration-300 hover:rotate-0">
-            <div className="aspect-[4/5] w-full overflow-hidden rounded-lg bg-[#F7F2EF]">
-              <img 
-                src={storyImg2} 
-                alt="SnugBear Soft Textures" 
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <p className="font-serif text-center text-[10px] text-[#7A6B5C]/70 mt-2.5">
-              choose your mood ✨
-            </p>
-          </div>
+{/* Secondary Overlapping Polaroid */}
+<div className="absolute z-0 bg-white p-3 pb-8 rounded-xl shadow-sm border border-[#6D442C]/5 rotate-[6deg] translate-x-24 translate-y-12 w-[180px] sm:w-[200px] transition-transform duration-300 hover:rotate-0">
+  <div className="aspect-[4/5] w-full overflow-hidden rounded-lg bg-[#F7F2EF]">
+    <img 
+      src="/images/creamy_beary.png" 
+      loading="lazy" 
+      alt="SnugBear Soft Textures" 
+      className="h-full w-full object-cover"
+    />
+  </div>
+  <p className="font-serif text-center text-[10px] text-[#7A6B5C]/70 mt-2.5">
+    choose your mood ✨
+  </p>
+</div>
         </div>
 
         {/* Right Side: Editorial Narrative Copy */}

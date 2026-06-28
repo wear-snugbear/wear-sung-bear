@@ -1,9 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
-import polaroidImg1 from "../../assets/images/polaroid1.png";
-import polaroidImg2 from "../../assets/images/polaroid2.png";
-
 export default function Hero() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,10 +75,15 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="relative flex h-[400px] w-full max-w-[480px] items-center justify-center md:h-[480px] md:flex-1">
-          <div className="absolute left-[5%] top-[8%] z-10 w-[200px] -rotate-6 rounded-sm bg-white p-3 shadow-xl sm:w-[230px]"><img src={polaroidImg1} alt="Showcase 1" className="h-full w-full object-cover" /></div>
-          <div className="absolute right-[5%] bottom-[8%] z-20 w-[200px] rotate-4 rounded-sm bg-white p-3 shadow-2xl sm:w-[230px]"><img src={polaroidImg2} alt="Showcase 2" className="h-full w-full object-cover" /></div>
-        </div>
+        {/* --- UPDATED IMAGE SECTION --- */}
+<div className="relative flex h-[400px] w-full max-w-[480px] items-center justify-center md:h-[480px] md:flex-1">
+  <div className="absolute left-[5%] top-[8%] z-10 w-[200px] -rotate-6 rounded-sm bg-white p-3 shadow-xl sm:w-[230px]">
+    <img src="/images/polaroid1.png" loading="lazy" alt="Showcase 1" className="h-full w-full object-cover" />
+  </div>
+  <div className="absolute right-[5%] bottom-[8%] z-20 w-[200px] rotate-4 rounded-sm bg-white p-3 shadow-2xl sm:w-[230px]">
+    <img src="/images/polaroid2.png" loading="lazy" alt="Showcase 2" className="h-full w-full object-cover" />
+  </div>
+</div>
       </div>
     </section>
   );

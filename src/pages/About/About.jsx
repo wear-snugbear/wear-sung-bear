@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import bearLogo from "../../assets/images/bear.png";
 
 
 // Background Heart Animation Component
@@ -138,18 +137,18 @@ function About() {
           </motion.div>
 
           {/* Image area with hover effects */}
-          <motion.div variants={fadeInUp} className="flex justify-center md:justify-end w-full">
-            <div className="relative h-72 w-72 sm:h-80 sm:w-80 lg:h-96 lg:w-96 rounded-3xl bg-gradient-to-tr from-white/90 to-[#FFFDF2]/95 border border-[#6D442C]/15 shadow-[0_18px_45px_rgba(91,57,33,0.22)] overflow-hidden group p-3 transition-all duration-500 hover:shadow-[0_24px_60px_rgba(91,57,33,0.28)] hover:border-[#FF8580]/35">
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#FF8580]/7 via-transparent to-[#E6D5A9]/22 mix-blend-multiply z-10 pointer-events-none" />
-              <div className="w-full h-full rounded-2xl bg-white flex items-center justify-center overflow-hidden shadow-inner">
-                <img
-                  src={bearLogo}
-                  alt="SnugBear Illustration"
-                  className="w-full h-full object-contain p-2 transition-transform duration-700 ease-out group-hover:scale-110 group-hover:rotate-1"
-                />
-              </div>
-            </div>
-          </motion.div>
+<motion.div variants={fadeInUp} className="flex justify-center md:justify-end w-full">
+  <div className="relative h-72 w-72 sm:h-80 sm:w-80 lg:h-96 lg:w-96 rounded-3xl bg-gradient-to-tr from-white/90 to-[#FFFDF2]/95 border border-[#6D442C]/15 shadow-[0_18px_45px_rgba(91,57,33,0.22)] overflow-hidden group p-3 transition-all duration-500 hover:shadow-[0_24px_60px_rgba(91,57,33,0.28)] hover:border-[#FF8580]/35">
+    <div className="absolute inset-0 bg-gradient-to-tr from-[#FF8580]/7 via-transparent to-[#E6D5A9]/22 mix-blend-multiply z-10 pointer-events-none" />
+    <div className="w-full h-full rounded-2xl bg-white flex items-center justify-center overflow-hidden shadow-inner">
+      <img
+        src="/images/bear.png" // UPDATED PATH
+        alt="SnugBear Illustration"
+        className="w-full h-full object-contain p-2 transition-transform duration-700 ease-out group-hover:scale-110 group-hover:rotate-1"
+      />
+    </div>
+  </div>
+</motion.div>
         </motion.div>
 
         {/* 2. Our Journey Section */}

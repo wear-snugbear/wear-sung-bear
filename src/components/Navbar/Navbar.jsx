@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../../assets/images/snugbear.png";
 import { useCart } from "../../context/CartContext";
 
 export default function Navbar() {
@@ -22,9 +21,14 @@ export default function Navbar() {
         </button>
 
         {/* Logo */}
-        <Link to="/" className="z-10 flex items-center">
-          <img src={logo} alt="SnugBear Logo" className="h-auto w-32 sm:w-40 md:w-52 object-fill" />
-        </Link>
+<Link to="/" className="z-10 flex items-center">
+  {/* UPDATED IMAGE PATH */}
+  <img 
+    src="/images/snugbear.png" 
+    alt="SnugBear Logo" 
+    className="h-auto w-32 sm:w-40 md:w-52 object-fill" 
+  />
+</Link>
 
         {/* Desktop Navigation Links Middle */}
         <nav className="hidden absolute left-1/2 transform -translate-x-1/2 items-center gap-8 text-sm font-semibold text-[#4D3A2A] md:flex">

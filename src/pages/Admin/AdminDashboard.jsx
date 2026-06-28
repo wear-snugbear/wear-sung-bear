@@ -125,7 +125,7 @@ export default function AdminDashboard() {
             }}
             className="bg-[#FF8580] text-white px-6 py-2 rounded-full font-bold hover:bg-[#6D442C] transition-all transform hover:scale-105 w-full md:w-auto"
           >
-            Reset Cycle
+            Reset
           </button>
         </div>
 

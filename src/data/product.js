@@ -1,16 +1,3 @@
-// 🐻 REAL IMAGE ASSETS IMPORTED FOR CENTRAL DATA LAYER
-import basicsImg from "../assets/images/basics.png";
-import cloudyNapImg from "../assets/images/cloudy_nap.png";
-import creamyBearImg from "../assets/images/creamy_beary.png";
-import crybabyClubImg from "../assets/images/crybaby_club.png";
-import daydreamBloomImg from "../assets/images/daydream_bloom.png";
-import deluluImg from "../assets/images/delulu.png";
-import honeyBearImg from "../assets/images/Honey_bear.png";
-import honeyHugImg from "../assets/images/Honey_Hug.png";
-import rosyBearImg from "../assets/images/rosy_bear.png";
-import sleepyBabyImg from "../assets/images/sleepy_baby.png";
-import tinyTantrumImg from "../assets/images/tiny_tantrum.png";
-
 const products = [
   {
     id: "honey-bear",
@@ -19,10 +6,10 @@ const products = [
     badge: "Basics Essential",
     price: 549,
     mrp: 799,
-    image: honeyBearImg,
+    image: "/images/Honey_bear.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: false,
-    description: "Indulge in extra relaxed luxury. This piece features classic cozy patterns made with love, ultra-durable comfort seams, and premium heavy-knit cloud textures."
+    description: "Indulge in extra relaxed luxury..."
   },
   {
     id: "rosy-bear",
@@ -31,10 +18,10 @@ const products = [
     badge: "Basics Essential",
     price: 549,
     mrp: 799,
-    image: rosyBearImg,
+    image: "/images/rosy_bear.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: false,
-    description: "A soft, blush-toned oversized fit designed for maximum comfort. Perfect for lounge hours or casual aesthetic layers."
+    description: "A soft, blush-toned oversized fit..."
   },
   {
     id: "creamy-bear",
@@ -43,10 +30,10 @@ const products = [
     badge: "Basics Essential",
     price: 549,
     mrp: 799,
-    image: creamyBearImg,
+    image: "/images/creamy_beary.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: false,
-    description: "An essential off-white, milky cloud layer offering premium dropped-shoulder relaxation cuts."
+    description: "An essential off-white, milky cloud layer..."
   },
   {
     id: "daydream-bloom",
@@ -55,10 +42,10 @@ const products = [
     badge: "Moody Collection",
     price: 699,
     mrp: 999,
-    image: daydreamBloomImg,
+    image: "/images/daydream_bloom.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: false,
-    description: "Vibrant custom aesthetics meet heavy premium blends. Expressive styles for moody winter dreamscapes."
+    description: "Vibrant custom aesthetics..."
   },
   {
     id: "sleepy-baby",
@@ -67,10 +54,10 @@ const products = [
     badge: "Cozy Choice",
     price: 699,
     mrp: 999,
-    image: sleepyBabyImg,
+    image: "/images/sleepy_baby.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: false,
-    description: "Tailored with loose premium loops to keep you floating all day. Snug, secure, and infinitely lazy."
+    description: "Tailored with loose premium loops..."
   },
   {
     id: "crybaby-club",
@@ -79,10 +66,10 @@ const products = [
     badge: "Trending",
     price: 699,
     mrp: 999,
-    image: crybabyClubImg,
+    image: "/images/crybaby_club.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: false,
-    description: "Join the cozy collective. Features bold, statement-making graphic alignments with premium structural ribbing."
+    description: "Join the cozy collective..."
   },
   {
     id: "honey-hug",
@@ -91,10 +78,10 @@ const products = [
     badge: "Oversized Fit",
     price: 699,
     mrp: 999,
-    image: honeyHugImg,
+    image: "/images/Honey_Hug.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: false,
-    description: "Literally feels like a big warm hug. Packed with cloud insulation textures and structured drop-lining headers."
+    description: "Literally feels like a big warm hug..."
   },
   {
     id: "cloudy-nap",
@@ -103,10 +90,10 @@ const products = [
     badge: "Limited Drop",
     price: 699,
     mrp: 999,
-    image: cloudyNapImg,
+    image: "/images/cloudy_nap.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: false,
-    description: "An exclusive heavy drop featuring high density, low-sheen loops optimized for complete daytime hibernation."
+    description: "An exclusive heavy drop..."
   },
   {
     id: "tiny-tantrum",
@@ -115,10 +102,10 @@ const products = [
     badge: "Classic Drop",
     price: 699,
     mrp: 999,
-    image: tinyTantrumImg,
+    image: "/images/tiny_tantrum.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: false,
-    description: "A compact expression of modern oversized streetwear cut directly out of premium pastel threads."
+    description: "A compact expression of modern..."
   },
   {
     id: "solulu-diaries",
@@ -127,10 +114,10 @@ const products = [
     badge: "Coming Soon",
     price: 0,
     mrp: 0,
-    image: deluluImg,
+    image: "/images/delulu.png", // UPDATED PATH
     sizes: ["S", "M", "L", "XL"],
     isComingSoon: true,
-    description: "Are we daydreaming? Maybe. Our most anticipated coming-soon drop featuring playful cloud silhouettes."
+    description: "Are we daydreaming? Maybe..."
   }
 ];
 

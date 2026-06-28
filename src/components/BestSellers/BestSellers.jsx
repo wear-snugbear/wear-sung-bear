@@ -1,31 +1,19 @@
 import { Link } from "react-router-dom";
 
 // 🐻 IMPORT YOUR PRODUCT IMAGES HERE
-// Replace these placeholders with your actual product image file paths
-import prod1 from "../../assets/images/cloudy_nap.png"; 
-import prod2 from "../../assets/images/creamy_beary.png";
-import prod3 from "../../assets/images/crybaby_club.png";
-import prod4 from "../../assets/images/daydream_bloom.png"; 
-import prod5 from "../../assets/images/Honey_bear.png";
-import prod6 from "../../assets/images/Honey_Hug.png";
-import prod7 from "../../assets/images/sleepy_baby.png"; 
-import prod8 from "../../assets/images/tiny_tantrum.png";
-import prod9 from "../../assets/images/rosy_bear.png"; // Added matching rosy_bear asset variable
 
 export default function BestSellers() {
   const products = [
-    // Snugbear Basics Collection Mappings
-    { id: "honey-bear", name: "Honey Bear", price: "₹549", img: prod5, badge: "Basics Essential" },
-    { id: "rosy-bear", name: "Rosy Bear", price: "₹549", img: prod9, badge: "Best Seller" },
-    { id: "creamy-bear", name: "Creamy Bear", price: "₹549", img: prod2, badge: "Comfy Pick" },
+    { id: "honey-bear", name: "Honey Bear", price: "₹549", img: "/images/Honey_bear.png", badge: "Basics Essential", collectionName: "Snugbear Basics" },
+    { id: "rosy-bear", name: "Rosy Bear", price: "₹549", img: "/images/rosy_bear.png", badge: "Best Seller", collectionName: "Snugbear Basics" },
+    { id: "creamy-bear", name: "Creamy Bear", price: "₹549", img: "/images/creamy_beary.png", badge: "Comfy Pick", collectionName: "Snugbear Basics" },
     
-    // Moody Collection Drops Mappings
-    { id: "daydream-bloom", name: "Daydream Bloom", price: "₹699", img: prod4, badge: "Cute Choice" },
-    { id: "sleepy-baby", name: "Sleepy Baby", price: "₹699", img: prod7, badge: "Cozy Essential" },
-    { id: "crybaby-club", name: "Crybaby Club", price: "₹699", img: prod3, badge: "New Trend" },
-    { id: "honey-hug", name: "Honey Hug", price: "₹699", img: prod6, badge: "Oversized Fit" },
-    { id: "cloudy-nap", name: "Cloudy Nap", price: "₹699", img: prod1, badge: "Must Have" },
-    { id: "tiny-tantrum", name: "Tiny Tantrum", price: "₹699", img: prod8, badge: "Classic Drop" },
+    { id: "daydream-bloom", name: "Daydream Bloom", price: "₹699", img: "/images/daydream_bloom.png", badge: "Cute Choice", collectionName: "Moody Collection" },
+    { id: "sleepy-baby", name: "Sleepy Baby", price: "₹699", img: "/images/sleepy_baby.png", badge: "Cozy Essential", collectionName: "Moody Collection" },
+    { id: "crybaby-club", name: "Crybaby Club", price: "₹699", img: "/images/crybaby_club.png", badge: "New Trend", collectionName: "Moody Collection" },
+    { id: "honey-hug", name: "Honey Hug", price: "₹699", img: "/images/Honey_Hug.png", badge: "Oversized Fit", collectionName: "Moody Collection" },
+    { id: "cloudy-nap", name: "Cloudy Nap", price: "₹699", img: "/images/cloudy_nap.png", badge: "Must Have", collectionName: "Moody Collection" },
+    { id: "tiny-tantrum", name: "Tiny Tantrum", price: "₹699", img: "/images/tiny_tantrum.png", badge: "Classic Drop", collectionName: "Moody Collection" },
   ];
 
   // Duplicate array to enable an unbroken, infinite pixel track loop

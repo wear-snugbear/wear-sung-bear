@@ -1,5 +1,4 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import snugbearLogo from "../../assets/images/snugbear.png";
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -26,23 +25,27 @@ export default function Footer() {
         {/* --- TOP SECTION: COMMUNITY CARD --- */}
         <div className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-r from-[#FFF0F0] to-[#FFEAE8] border border-[#FF8580]/10 p-6 sm:p-8 lg:p-10 shadow-sm">
           <div className="grid gap-6 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
-              <div className="flex justify-center lg:justify-start items-center gap-2">
-                <span className="text-2xl animate-bounce duration-1000">📸</span>
-                <h2 className="font-serif text-2xl font-extrabold sm:text-3xl tracking-tight text-[#4D3A2A]">
-                  Your vibe, your style, your <span className="text-[#FF8580]">SnugBear</span> story.
-                </h2>
-              </div>
-              <p className="text-xs sm:text-sm text-[#7A6B5C] font-medium max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                Every snap, every tag, and every review helps someone find their new favorite fit. Join our cozy circle!
-              </p>
-              <div className="pt-2">
-                <button className="group inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-[#FF8580] px-6 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition-all hover:bg-[#E5746F] hover:scale-[1.02] active:scale-[0.98]">
-                  <span>Join The Community</span>
-                  <span className="transition-transform duration-300 group-hover:scale-125">♥</span>
-                </button>
-              </div>
-            </div>
+    <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
+      <div className="flex justify-center lg:justify-start items-center gap-2">
+        <span className="text-2xl animate-bounce duration-1000">📸</span>
+        <h2 className="font-serif text-2xl font-extrabold sm:text-3xl tracking-tight text-[#4D3A2A]">
+          Your vibe, your style, your <span className="text-[#FF8580]">SnugBear</span> story.
+        </h2>
+      </div>
+      <p className="text-xs sm:text-sm text-[#7A6B5C] font-medium max-w-xl mx-auto lg:mx-0 leading-relaxed">
+        Every snap, every tag, and every review helps someone find their new favorite fit. Join our cozy circle!
+      </p>
+      <div className="pt-2">
+        {/* UPDATED BUTTON BELOW */}
+        <button 
+          onClick={() => navigate("/community")} 
+          className="group inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-[#FF8580] px-6 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition-all hover:bg-[#E5746F] hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <span>Join The Community</span>
+          <span className="transition-transform duration-300 group-hover:scale-125">♥</span>
+        </button>
+      </div>
+    </div>
 
             <div className="lg:col-span-5 bg-white/70 backdrop-blur-xs rounded-2xl p-5 border border-white/60 grid grid-cols-3 gap-2 text-center shadow-xs">
               <div className="space-y-1 p-1">
@@ -84,12 +87,17 @@ export default function Footer() {
         {/* --- BOTTOM SECTION: DIRECTORY LINKS & NEWSLETTER --- */}
         <div className="grid gap-8 pt-6 border-t border-[#6D442C]/10 sm:grid-cols-2 md:grid-cols-12">
           <div className="md:col-span-4 space-y-4 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start">
-              <img src={snugbearLogo} alt="SnugBear Logo" className="h-12 w-auto object-contain transition-transform hover:scale-[1.02]" />
-            </div>
-            <p className="text-xs font-medium text-[#7A6B5C] leading-relaxed max-w-xs mx-auto sm:mx-0">
-              Cute oversized croptops and comfort pieces made for every version of you. 
-            </p>
+    <div className="flex items-center justify-center sm:justify-start">
+      {/* UPDATED IMAGE PATH */}
+      <img 
+        src="/images/snugbear.png" 
+        alt="SnugBear Logo" 
+        className="h-12 w-auto object-contain transition-transform hover:scale-[1.02]" 
+      />
+    </div>
+    <p className="text-xs font-medium text-[#7A6B5C] leading-relaxed max-w-xs mx-auto sm:mx-0">
+      Cute oversized croptops and comfort pieces made for every version of you. 
+    </p>
             
             {/* Social Indicators */}
             <div className="flex items-center justify-center sm:justify-start gap-4 pt-1 text-[#6D442C]">
@@ -117,12 +125,27 @@ export default function Footer() {
               </ul>
             </div>
             <div className="space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#4D3A2A]">Help</h3>
-              <ul className="space-y-2 text-[11px] font-medium text-[#7A6B5C]">
-                <li><Link to="/faq" className="hover:text-[#FF8580] transition-colors">FAQs</Link></li>
-                <li><Link to="/track-order" className="hover:text-[#FF8580] transition-colors">Shipping</Link></li>
-              </ul>
-            </div>
+  <h3 className="text-xs font-bold uppercase tracking-wider text-[#4D3A2A]">Help</h3>
+  <ul className="space-y-2 text-[11px] font-medium text-[#7A6B5C]">
+    {/* Changed from Link to a button with navigate() */}
+    <li>
+      <button 
+        onClick={() => {
+          navigate("/faq");
+          window.scrollTo(0, 0); // Ensures the user starts at the top of the FAQ page
+        }} 
+        className="hover:text-[#FF8580] transition-colors text-left w-full"
+      >
+        FAQs
+      </button>
+    </li>
+    <li>
+      <Link to="/track-order" className="hover:text-[#FF8580] transition-colors">
+        Shipping
+      </Link>
+    </li>
+  </ul>
+</div>
             <div className="space-y-3">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[#4D3A2A]">About</h3>
               <ul className="space-y-2 text-[11px] font-medium text-[#7A6B5C]">
@@ -136,16 +159,7 @@ export default function Footer() {
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#4D3A2A] flex items-center justify-center sm:justify-start gap-1">
               <span>Join The Snug Club</span>
               <span className="text-[#FF8580]">♥</span>
-            </h3>
-            <p className="text-[11px] text-[#7A6B5C] font-medium leading-relaxed">
-              Sign up & get <span className="font-bold text-[#FF8580]">10% off</span> your first cozy order!
-            </p>
-            <form onSubmit={handleSubmit} className="relative mt-2 flex items-center">
-              <input type="email" placeholder="Enter your email" required className="w-full h-9 rounded-full border border-[#6D442C]/15 bg-white pl-4 pr-10 text-[11px] font-medium text-[#4D3A2A] placeholder-[#7A6B5C]/50 outline-none transition-all focus:border-[#FF8580]/50 focus:ring-1 focus:ring-[#FF8580]/20" />
-              <button type="submit" className="group absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-[#6D442C] text-white transition-all hover:bg-[#FF8580]">
-                <span className="text-xs transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-              </button>
-            </form>
+            </h3>            
           </div>
         </div>
 
