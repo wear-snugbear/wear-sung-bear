@@ -35,7 +35,7 @@ export default function Checkout() {
 
     try {
       // Use the actual API URL if deployed, or localhost for testing
-      const API_BASE = "http://localhost:5000"; 
+      const API_BASE = "https://snugbear-backend-dosj.onrender.com"; 
       
       const response = await fetch(`${API_BASE}/api/checkout`, {
         method: "POST",

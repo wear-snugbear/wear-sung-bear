@@ -126,28 +126,24 @@ def update_order(order_id):
 # Route to submit the form
 @app.route('/api/community/founding-circle', methods=['POST', 'OPTIONS'])
 def founding_circle():
-    # This specifically handles the browser "preflight" check
     if request.method == "OPTIONS":
-        response = jsonify({})
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        response.headers.add("Access-Control-Allow-Methods", "POST")
-        return response, 200
+        return jsonify({}), 200
 
     data = request.json
-    if not data or not data.get('order_id') or not data.get('email'):
-        return jsonify({"error": "Missing details"}), 400
-    
     try:
         db.founding_circle.insert_one({
-            "order_id": data['order_id'],
-            "email": data['email'],
-            "instagram": data.get('instagram', ''),
+            "order_id": data.get('order_id', 'N/A'),
+            "email": data.get('email'),
+            "instagram": data.get('instagram', 'N/A'),
+            "productName": "Pending Selection", # Default value for community signups
             "submitted_at": datetime.now(timezone.utc)
         })
         return jsonify({"message": "Successfully joined!"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# The claim_gift route you already have is fine! 
+# It saves to founding_circle with "order_id": "Gift-Claimed"
 
 # # Route for Admin to see the entries
 # @app.route('/api/admin/founding-circle', methods=['GET'])
@@ -168,32 +164,35 @@ def get_current_offer():
 
 @app.route('/api/claim-gift', methods=['POST', 'OPTIONS'])
 def claim_gift():
-    if request.method == "OPTIONS":
-        response = jsonify({})
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        return response, 200
-
+    if request.method == "OPTIONS": return jsonify({}), 200
+    
     data = request.json
-    try:
-        # 1. Save to claimed_gifts
-        db.claimed_gifts.insert_one({
-            "email": data['email'],
-            "productName": data['productName'],
-            "productId": data.get('productId', 'N/A'),
+    email = data.get('email')
+    
+    # Try to find an existing entry by email and update it
+    result = db.founding_circle.update_one(
+        {"email": email}, 
+        {
+            "$set": {
+                "productName": data.get('productName'),
+                "productId": data.get('productId'),
+                "claimed_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    
+    # If no existing entry was found by email, insert a new one
+    if result.matched_count == 0:
+        db.founding_circle.insert_one({
+            "email": email,
+            "productName": data.get('productName'),
+            "productId": data.get('productId'),
+            "order_id": data.get('order_id', 'N/A'),
+            "instagram": data.get('instagram', 'N/A'),
             "claimed_at": datetime.now(timezone.utc)
         })
         
-        # 2. ALSO save to founding_circle so your dashboard count updates
-        db.founding_circle.insert_one({
-            "email": data['email'],
-            "order_id": "Gift-Claimed", 
-            "submitted_at": datetime.now(timezone.utc)
-        })
-        
-        return jsonify({"message": "Success"}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify({"message": "Success"}), 200
 
 @app.route('/api/admin/claimed-gifts', methods=['GET'])
 def get_claimed_gifts():
@@ -201,11 +200,25 @@ def get_claimed_gifts():
     gifts = list(db.claimed_gifts.find({}, {'_id': 0}).sort("claimed_at", -1))
     return jsonify(gifts)
 
-# Route for Admin to see the entries
+
 @app.route('/api/admin/founding-circle', methods=['GET'])
 def get_founding_circle():
-    entries = list(db.founding_circle.find({}, {'_id': 0}).sort("submitted_at", 1))
+    # Pymongo: Fetching from MongoDB
+    entries = list(db.founding_circle.find({}, {'_id': 0}))
     return jsonify(entries)
+
+# Route for Admin to clear Claimed Gifts
+# Route for Admin to clear Claimed Gifts
+@app.route('/api/admin/reset-claimed-gifts', methods=['DELETE'])
+def reset_claimed_gifts():
+    db.claimed_gifts.delete_many({}) 
+    return jsonify({"message": "Claimed gifts cleared successfully!"}), 200
+
+# Route for Admin to clear Founding Circle
+@app.route('/api/admin/reset-founding-circle', methods=['DELETE'])
+def reset_founding_circle():
+    db.founding_circle.delete_many({})
+    return jsonify({"message": "Founding Circle cleared successfully!"}), 200
 
 if __name__ == '__main__':
     # Render will provide a PORT environment variable. 
