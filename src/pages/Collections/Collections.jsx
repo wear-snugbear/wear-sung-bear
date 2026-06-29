@@ -259,24 +259,23 @@ function ProductCard({ product, index, onQuickView }) {
         HEART BUTTON LAYER 
         Placed outside the main content flow to ensure it captures clicks first.
       */}
-      {!product.isComingSoon && (
-        <div className="absolute top-6 right-6 z-[60] pointer-events-auto">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              toggleWishlist(product);
-            }}
-            className={`h-9 w-9 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300 border border-[#6D442C]/10 ${
-              isLiked
-                ? "text-[#FF4D6D] scale-110 shadow-md"
-                : "text-[#FFB7B2] hover:text-[#FF4D6D] hover:scale-110"
-            }`}
-          >
-            <span className="text-lg leading-none">{isLiked ? "♥" : "♡"}</span>
-          </button>
-        </div>
-      )}
+      {/* HEART BUTTON LAYER */}
+{!product.isComingSoon && (
+  <div className="absolute top-4 right-4 z-[100] touch-manipulation"> 
+    <button
+      onClick={(e) => {
+        e.stopPropagation(); // Prevents image click
+        e.preventDefault();  // Prevents ghost clicks
+        toggleWishlist(product);
+      }}
+      className={`h-10 w-10 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md transition-all duration-300 border border-[#6D442C]/10 active:scale-90 ${
+        isLiked ? "text-[#FF4D6D]" : "text-[#FFB7B2]"
+      }`}
+    >
+      <span className="text-xl leading-none">{isLiked ? "♥" : "♡"}</span>
+    </button>
+  </div>
+)}
 
       {/* Main Card Content */}
       <div className="relative">
