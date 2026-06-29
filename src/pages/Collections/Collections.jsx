@@ -261,20 +261,23 @@ function ProductCard({ product, index, onQuickView }) {
       */}
       {/* HEART BUTTON LAYER */}
 {/* HEART BUTTON LAYER */}
+{/* HEART BUTTON LAYER */}
 {!product.isComingSoon && (
-  <div className="absolute top-4 right-4 z-[100]">
+  <div 
+    className="absolute top-4 right-4 z-[100]" 
+    style={{ touchAction: 'manipulation' }}
+  >
     <button
       type="button"
       onClick={(e) => {
-        e.stopPropagation(); 
+        e.stopPropagation(); // Stops the click from bubbling to the Image wrapper
         toggleWishlist(product);
       }}
-      className={`h-10 w-10 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md transition-all duration-300 border border-[#6D442C]/10 active:scale-90 touch-none ${
+      className={`h-10 w-10 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md transition-all duration-300 border border-[#6D442C]/10 active:scale-90 ${
         isLiked ? "text-[#FF4D6D]" : "text-[#FFB7B2]"
       }`}
-      style={{ WebkitTapHighlightColor: "transparent" }}
     >
-      <span className="text-xl leading-none select-none pointer-events-none">
+      <span className="text-xl leading-none pointer-events-none">
         {isLiked ? "♥" : "♡"}
       </span>
     </button>
