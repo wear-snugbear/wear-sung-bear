@@ -9,14 +9,19 @@ export default function Signup() {
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
-    e.preventDefault();
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigate("/collections");
-    } catch (error) {
-      alert(error.message);
+  e.preventDefault(); // Stop page refresh
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    alert("Sign up successful!");
+    navigate("/collections");
+  } catch (error) {
+    if (error.code === 'auth/email-already-in-use') {
+      alert("This email is already registered. Please login instead!");
+    } else {
+      alert("Error: " + error.message);
     }
-  };
+  }
+};
 
   const handleGoogleSignup = async () => {
     try {
