@@ -19,7 +19,7 @@ import FoundingCircle from "./pages/FoundingCircle/FoundingCircle.jsx";
 import FAQ from "./pages/FAQ/FAQ.jsx";
 import Wishlist from "./pages/Wishlist/Wishlist.jsx"; // Make sure to import your new Wishlist page
 import Login from "./pages/Login/Login.jsx";   // Added Login import
-import Signup from "./pages/Signup/Signup.jsx";
+import Signup from "./pages/SignUp/SignUp.jsx";
 
 function App() {
   const [showLanding, setShowLanding] = useState(true);
@@ -55,7 +55,7 @@ function App() {
           <Route path="/founding-circle" element={<FoundingCircle />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/login" element={<Login />} />     {/* Added Login Route */}
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/signup" element={<SignUp />} />
         </Routes>
       </main>
     </BrowserRouter>
