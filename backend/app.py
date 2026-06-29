@@ -220,6 +220,35 @@ def reset_founding_circle():
     db.founding_circle.delete_many({})
     return jsonify({"message": "Founding Circle cleared successfully!"}), 200
 
+# --- Add these to your app.py ---
+
+@app.route('/api/wishlist/<email>', methods=['GET'])
+def get_wishlist(email):
+    # Find the wishlist document for this email
+    wishlist = db.wishlist.find_one({"email": email}, {'_id': 0})
+    # If it doesn't exist, return an empty list
+    return jsonify(wishlist.get("items", []) if wishlist else [])
+
+@app.route('/api/wishlist/update', methods=['POST', 'OPTIONS'])
+def update_wishlist():
+    if request.method == "OPTIONS": return jsonify({}), 200
+    
+    data = request.json
+    email = data.get('email')
+    items = data.get('items') # Expecting the full updated array of products
+    
+    if not email:
+        return jsonify({"error": "Email required"}), 400
+
+    # Upsert: Update if exists, insert if not
+    db.wishlist.update_one(
+        {"email": email},
+        {"$set": {"items": items}},
+        upsert=True
+    )
+    
+    return jsonify({"message": "Wishlist updated"}), 200
+
 if __name__ == '__main__':
     # Render will provide a PORT environment variable. 
     # If not provided (like when running locally), default to 5000.

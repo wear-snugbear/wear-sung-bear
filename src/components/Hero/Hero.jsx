@@ -1,22 +1,8 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function Hero() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleScrollToStory = () => {
-    // If already on home, scroll to the ID. 
-    // Otherwise, navigate home then scroll.
-    if (location.pathname !== "/") {
-      navigate("/");
-      // The scroll happens after navigation (handled in Home.jsx useEffect)
-      localStorage.setItem("scrollTo", "founder-story");
-    } else {
-      document.getElementById("founder-story")?.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   const floatingHearts = [
     { id: 1, left: "5%", size: 14, delay: 0, duration: 6 },
     { id: 2, left: "15%", size: 22, delay: 2.5, duration: 7 },
@@ -63,27 +49,29 @@ export default function Hero() {
           </div>
 
           <div className="flex flex-wrap items-center gap-4 pt-1">
-            <Link to="/collections" className="inline-flex h-12 items-center justify-center rounded-full bg-[#FF8580] px-8 text-sm font-bold text-white shadow-md transition-all hover:bg-[#E5746F]">
-              Shop Collection
+            {/* Login Button (Styled like the Shop Collection button) */}
+            <Link to="/login" className="inline-flex h-12 items-center justify-center rounded-full bg-[#FF8580] px-8 text-sm font-bold text-white shadow-md transition-all hover:bg-[#E5746F]">
+              Login
             </Link>
-            <button
-              onClick={handleScrollToStory}
+            
+            {/* Sign Up Button (Styled like the Our Story button) */}
+            <Link
+              to="/signup"
               className="inline-flex h-12 items-center justify-center rounded-full border-2 border-[#4D3A2A]/20 bg-transparent px-8 text-sm font-bold text-[#4D3A2A] transition-all hover:bg-[#4D3A2A]/5"
             >
-              Our Story
-            </button>
+              Sign Up
+            </Link>
           </div>
         </div>
 
-        {/* --- UPDATED IMAGE SECTION --- */}
-<div className="relative flex h-[400px] w-full max-w-[480px] items-center justify-center md:h-[480px] md:flex-1">
-  <div className="absolute left-[5%] top-[8%] z-10 w-[200px] -rotate-6 rounded-sm bg-white p-3 shadow-xl sm:w-[230px]">
-    <img src="/images/polaroid1.png" loading="lazy" alt="Showcase 1" className="h-full w-full object-cover" />
-  </div>
-  <div className="absolute right-[5%] bottom-[8%] z-20 w-[200px] rotate-4 rounded-sm bg-white p-3 shadow-2xl sm:w-[230px]">
-    <img src="/images/polaroid2.png" loading="lazy" alt="Showcase 2" className="h-full w-full object-cover" />
-  </div>
-</div>
+        <div className="relative flex h-[400px] w-full max-w-[480px] items-center justify-center md:h-[480px] md:flex-1">
+          <div className="absolute left-[5%] top-[8%] z-10 w-[200px] -rotate-6 rounded-sm bg-white p-3 shadow-xl sm:w-[230px]">
+            <img src="/images/polaroid1.png" loading="lazy" alt="Showcase 1" className="h-full w-full object-cover" />
+          </div>
+          <div className="absolute right-[5%] bottom-[8%] z-20 w-[200px] rotate-4 rounded-sm bg-white p-3 shadow-2xl sm:w-[230px]">
+            <img src="/images/polaroid2.png" loading="lazy" alt="Showcase 2" className="h-full w-full object-cover" />
+          </div>
+        </div>
       </div>
     </section>
   );

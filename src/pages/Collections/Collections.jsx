@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../../context/CartContext"; // 🛒 Shared cart hook
+import { useWishlist } from "../../context/WishlistContext";
 
 // ==========================================
 // 1. COMBINED GLOBAL BACKGROUND ANIMATION LAYER
@@ -227,16 +228,17 @@ function FilterSidebar({ selectedCategory, setSelectedCategory }) {
     </div>
   );
 }
-
 // ==========================================
-// 5. ENHANCED PRODUCT CARD COMPONENT
+// 5. ENHANCED PRODUCT CARD COMPONENT (UPDATED)
 // ==========================================
 function ProductCard({ product, index, onQuickView }) {
   const { addToCart } = useCart();
   const [selectedCardSize, setSelectedCardSize] = useState("M");
   const [isAdded, setIsAdded] = useState(false);
-  const discountPercentage =
-    product.mrp > 0 ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
+  const { wishlist, toggleWishlist } = useWishlist();
+
+  // Ensure consistent ID comparison
+  const isLiked = wishlist?.some((item) => String(item.id) === String(product.id));
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -250,46 +252,58 @@ function ProductCard({ product, index, onQuickView }) {
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.6,
-        delay: index * 0.1,
-        ease: [0.215, 0.61, 0.355, 1],
-      }}
-      className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[#6D442C]/10 bg-white/95 p-3 shadow-[0_14px_30px_rgba(77,58,42,0.08)] hover:shadow-[0_18px_40px_rgba(77,58,42,0.12)] transition-shadow z-10"
+      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.215, 0.61, 0.355, 1] }}
+      className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[#6D442C]/10 bg-white/95 p-3 shadow-[0_14px_30px_rgba(77,58,42,0.08)] hover:shadow-[0_18px_40px_rgba(77,58,42,0.12)] transition-shadow"
     >
-      <div>
-        <div className="absolute top-5 left-5 right-5 z-20 flex items-center justify-between pointer-events-none">
+      {/* 
+        HEART BUTTON LAYER 
+        Placed outside the main content flow to ensure it captures clicks first.
+      */}
+      {!product.isComingSoon && (
+        <div className="absolute top-6 right-6 z-[60] pointer-events-auto">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              toggleWishlist(product);
+            }}
+            className={`h-9 w-9 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300 border border-[#6D442C]/10 ${
+              isLiked
+                ? "text-[#FF4D6D] scale-110 shadow-md"
+                : "text-[#FFB7B2] hover:text-[#FF4D6D] hover:scale-110"
+            }`}
+          >
+            <span className="text-lg leading-none">{isLiked ? "♥" : "♡"}</span>
+          </button>
+        </div>
+      )}
+
+      {/* Main Card Content */}
+      <div className="relative">
+        {/* Badge Layer */}
+        <div className="absolute top-5 left-5 z-20">
           <span className="inline-flex items-center rounded-full bg-white/95 backdrop-blur-xs px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-[#7A5A3A] uppercase shadow-xs">
             {product.badge}
           </span>
-          {product.isComingSoon ? (
-            <span className="inline-flex items-center rounded-full bg-[#FFD1DA] px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-[#6D442C] uppercase shadow-xs">
-              Soon ✨
-            </span>
-          ) : (
-            <button className="pointer-events-auto h-7 w-7 flex items-center justify-center rounded-full bg-white/95 shadow-xs text-sm text-[#FFB7B2] hover:text-[#FF4D6D] hover:scale-110 active:scale-95 transition-all">
-              ♥
-            </button>
-          )}
         </div>
 
         <SparkleEffect containerId={product.id} />
 
-        <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#FFF9F6]">
+        {/* CLICKABLE IMAGE WRAPPER */}
+        <div
+          className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#FFF9F6] cursor-pointer"
+          onClick={() => !product.isComingSoon && onQuickView(product)}
+        >
           <img
             src={product.image}
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
-
           {!product.isComingSoon && (
-            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20">
-              <button
-                onClick={() => onQuickView(product)}
-                className="bg-white/95 text-[#4D3A2A] text-xs font-bold px-3 py-2 rounded-xl shadow-sm hover:bg-[#6D442C] hover:text-white transition-all transform translate-y-2 group-hover:translate-y-0 duration-300"
-              >
+            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20 pointer-events-none">
+              <span className="bg-white/95 text-[#4D3A2A] text-xs font-bold px-3 py-2 rounded-xl shadow-sm">
                 Quick View 👀
-              </button>
+              </span>
             </div>
           )}
         </div>
@@ -313,11 +327,6 @@ function ProductCard({ product, index, onQuickView }) {
                 <span className="text-xs font-medium text-[#7A6B5C]/50 line-through">
                   ₹{product.mrp}
                 </span>
-                {discountPercentage > 0 && (
-                  <span className="text-[10px] font-black text-[#FF4D6D] bg-[#FFE5EC] px-1.5 py-0.5 rounded-sm">
-                    {discountPercentage}% OFF
-                  </span>
-                )}
               </>
             )}
           </div>
@@ -326,10 +335,13 @@ function ProductCard({ product, index, onQuickView }) {
             <div className="mt-3 space-y-1.5">
               <span className="text-[10px] font-bold text-[#7A6B5C]/70 block">Select Size:</span>
               <div className="flex gap-1">
-                {product.sizes.map((sz) => (
+                {product.sizes?.map((sz) => (
                   <button
                     key={sz}
-                    onClick={() => setSelectedCardSize(sz)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedCardSize(sz);
+                    }}
                     className={`h-6 w-7 text-[10px] font-black rounded-md border transition-all ${
                       selectedCardSize === sz
                         ? "bg-[#6D442C] text-white border-[#6D442C]"
@@ -346,35 +358,20 @@ function ProductCard({ product, index, onQuickView }) {
       </div>
 
       <div className="mt-4 flex gap-1.5">
-        {product.isComingSoon ? (
-          <button className="w-full rounded-xl bg-[#FFF9F6] border border-[#6D442C]/10 py-2 text-xs font-bold tracking-wide text-[#7A6B5C]/70 cursor-not-allowed">
-            Notify Me When Fresh ☁️
-          </button>
-        ) : (
-          <>
-            <button
-              onClick={() => onQuickView(product)}
-              className="lg:hidden px-2.5 rounded-xl border border-[#6D442C]/15 text-sm flex items-center justify-center bg-white/90"
-            >
-              👀
-            </button>
-            <button
-              onClick={handleAddToCart}
-              className={`flex-1 rounded-xl py-2 text-xs font-bold tracking-wide transition-all duration-300 ${
-                isAdded
-                  ? "bg-[#E2F7ED] text-[#1FA66A]"
-                  : "bg-[#6D442C] text-white hover:bg-[#4D3A2A] active:scale-[0.98]"
-              }`}
-            >
-              {isAdded ? `Added ${selectedCardSize}! 🎀` : "Quick Add 🧸"}
-            </button>
-          </>
-        )}
+        <button
+          onClick={handleAddToCart}
+          className={`w-full rounded-xl py-2 text-xs font-bold tracking-wide transition-all duration-300 ${
+            isAdded
+              ? "bg-[#E2F7ED] text-[#1FA66A]"
+              : "bg-[#6D442C] text-white hover:bg-[#4D3A2A] active:scale-[0.98]"
+          }`}
+        >
+          {isAdded ? `Added ${selectedCardSize}! 🎀` : "Quick Add 🧸"}
+        </button>
       </div>
     </motion.div>
   );
 }
-
 // ==========================================
 // 6. QUICK VIEW OVERLAY MODAL SYSTEM
 // ==========================================

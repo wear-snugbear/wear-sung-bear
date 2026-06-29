@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { CartProvider } from "./context/CartContext.jsx"; // 🛒 1. IMPORT YOUR NEW CART CONTEXT PROVIDER
-
 // Layout and Main Wrapper
 import Navbar from "./components/Navbar/Navbar.jsx"; 
 
@@ -19,6 +17,9 @@ import TrackOrder from "./pages/TrackOrder/TrackOrder.jsx";
 import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import FoundingCircle from "./pages/FoundingCircle/FoundingCircle.jsx";
 import FAQ from "./pages/FAQ/FAQ.jsx";
+import Wishlist from "./pages/Wishlist/Wishlist.jsx"; // Make sure to import your new Wishlist page
+import Login from "./pages/Login/Login.jsx";   // Added Login import
+import Signup from "./pages/Signup/Signup.jsx";
 
 function App() {
   const [showLanding, setShowLanding] = useState(true);
@@ -31,35 +32,33 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // 1. Show the isolated landing page for the first 5 seconds
   if (showLanding) {
     return <LandingPage />;
   }
 
-  // 2. Once the landing page finishes, render the core application routing with the Navbar
-  // 🌟 FIX: Wrap everything inside <CartProvider> so context hooks like useCart() can execute safely!
   return (
-    <CartProvider>
-      <BrowserRouter>
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/collections" element={<Collections />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/track-order" element={<TrackOrder />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/founding-circle" element={<FoundingCircle />} />
-            <Route path="/faq" element={<FAQ />} />
-          </Routes>
-        </main>
-      </BrowserRouter>
-    </CartProvider>
+    <BrowserRouter>
+      <Navbar />
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/collections" element={<Collections />} />
+          <Route path="/wishlist" element={<Wishlist />} /> {/* Add this route */}
+          <Route path="/community" element={<Community />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/track-order" element={<TrackOrder />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/founding-circle" element={<FoundingCircle />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/login" element={<Login />} />     {/* Added Login Route */}
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
   );
 }
 
