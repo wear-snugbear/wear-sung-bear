@@ -1,13 +1,26 @@
 @import "tailwindcss";
 
-/* Reset default body margin and ensure full-height pages */
-html, body, #root {
-	height: 100%;
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #FEFDE4;
+  overflow-x: hidden;
+  /* Remove scroll-snap-type if it exists to stop the 'snapping' jitter */
 }
 
-body {
-	margin: 0;
-	background-color: #FEFDE4;
+#root {
+  min-height: 200vh; /* Ensures there is always room to scroll */
+}
+/* Add this to your main CSS file (e.g., index.css) */
+.swiper-pagination-bullets {
+  bottom: 0px !important; /* Forces the dots to the very bottom of the Swiper container */
 }
 
-/* Keep Tailwind base utilities available */
+.swiper-pagination-bullet {
+  background: #d1d5db !important; /* Inactive dot color */
+  opacity: 1 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #FF8580 !important; /* Active dot color */
+}

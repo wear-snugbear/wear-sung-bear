@@ -20,7 +20,8 @@ export default function BestSellers() {
   const doubleProducts = [...products, ...products];
 
   return (
-    <section className="relative w-full bg-[#FFF9F6] py-16 overflow-hidden">
+    // Change py-16 to pt-4 pb-16
+<section className="relative w-full bg-[#FFF9F6] pt-16 pb-16 overflow-hidden">
       
       {/* Section Typography Title */}
       <div className="mb-10 text-center space-y-2 px-4">

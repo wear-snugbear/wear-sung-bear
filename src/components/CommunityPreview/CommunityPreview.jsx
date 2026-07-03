@@ -67,7 +67,7 @@ export default function CollectionsPreview() {
   ];
 
   return (
-    <section className="relative w-full bg-[#FFF9F6] px-4 py-20 overflow-hidden">
+    <section className="relative w-full bg-[#FFF9F6] px-4 pt-10 pb-2 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none z-0 opacity-40">
         <AnimatePresence>
           {cuteEffects.map((effect) => (
@@ -93,56 +93,64 @@ export default function CollectionsPreview() {
           </h2>
         </div>
 
-        {/* SWIPER COMPONENT */}
-        <Swiper
+<Swiper
   modules={[Autoplay, Pagination]}
   spaceBetween={20}
   slidesPerView={1}
-  // Disable loop if you have fewer than 4 items to avoid this warning
   loop={collections.length > 3} 
   autoplay={{ delay: 3000, disableOnInteraction: false }}
-  pagination={{ clickable: true }}
-  // watchOverflow helps Swiper behave gracefully when not enough slides exist
+  pagination={{ 
+    clickable: true,
+    bulletActiveClass: 'swiper-pagination-bullet-active !bg-[#FF8580]' // Custom active color
+  }}
   watchOverflow={true} 
   breakpoints={{
     640: { slidesPerView: 2 },
     1024: { slidesPerView: 3 },
   }}
-  className="pb-12"
+  // INCREASE THIS: The pb-16 gives the dots enough space to exist below the button
+  className="pb-10" 
 >
           {collections.map((item) => (
-            <SwiperSlide key={item.id}>
-              <motion.div
-                whileHover={{ y: -5 }}
-                className={`flex flex-col rounded-3xl border ${item.border} ${item.bg} p-4 shadow-sm hover:shadow-xl transition-all duration-300`}
-              >
-                <div className="p-4 bg-gray-50 rounded-2xl mb-4">
-                  <div className="relative aspect-square w-full overflow-hidden rounded-xl">
-                    <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
-                    <span className="absolute top-2 left-2 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider text-[#4D3A2A]">
-                      {item.badge}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="px-2 pb-2 flex-1">
-                  <h3 className="font-serif text-xl font-bold text-[#4D3A2A] mb-2">{item.title}</h3>
-                  <div className="space-y-1 mb-6">
-                    {item.description.map((desc, i) => (
-                      <p key={i} className="text-xs text-[#7A6B5C] font-medium italic">✦ {desc}</p>
-                    ))}
-                  </div>
-                </div>
-
-                <Link
-                  to={item.isComingSoon ? "#" : item.link}
-                  className={`w-full h-10 flex items-center justify-center rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${item.btnStyle}`}
-                >
-                  {item.isComingSoon ? "Coming Soon" : "View Collection"}
-                </Link>
-              </motion.div>
-            </SwiperSlide>
+  <SwiperSlide key={item.id} className="h-auto"> {/* Added h-auto to ensure slide height matches content */}
+    <motion.div
+      whileHover={{ y: -5 }}
+      className={`flex flex-col h-full rounded-3xl border ${item.border} ${item.bg} p-4 shadow-sm hover:shadow-xl transition-all duration-300`}
+    >
+      {/* Image Container with fixed Aspect Ratio for Mobile */}
+      <div className="w-full bg-gray-50 rounded-2xl mb-4 overflow-hidden">
+        <div className="relative aspect-[4/5] w-full"> {/* Changed to 4/5 for a more natural look than square */}
+          <img 
+            src={item.image} 
+            alt={item.title} 
+            className="h-full w-full object-cover" 
+          />
+          <span className="absolute top-2 left-2 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider text-[#4D3A2A]">
+            {item.badge}
+          </span>
+        </div>
+      </div>
+      
+      {/* Content wrapper: added flex-grow so button stays at bottom */}
+      <div className="px-2 pb-2 flex-grow">
+        <h3 className="font-serif text-xl font-bold text-[#4D3A2A] mb-2">{item.title}</h3>
+        <div className="space-y-1 mb-6">
+          {item.description.map((desc, i) => (
+            <p key={i} className="text-xs text-[#7A6B5C] font-medium italic">✦ {desc}</p>
           ))}
+        </div>
+      </div>
+
+      {/* Button stays at the bottom of the card */}
+      <Link
+        to={item.isComingSoon ? "#" : item.link}
+        className={`w-full h-10 flex items-center justify-center rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${item.btnStyle}`}
+      >
+        {item.isComingSoon ? "Coming Soon" : "View Collection"}
+      </Link>
+    </motion.div>
+  </SwiperSlide>
+))}
         </Swiper>
       </div>
     </section>

@@ -11,37 +11,36 @@ export default function DiscountBanner() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    // INCREASED: 6000ms (6 seconds) gives users plenty of time to read
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % discounts.length);
-    }, 4000); 
+    }, 6000); 
     
     return () => clearInterval(timer);
   }, []);
 
   return (
     <div 
-      className="w-full py-3 transition-colors duration-700 ease-in-out flex items-center justify-center overflow-hidden"
+      className="w-full py-3 transition-colors duration-1000 ease-in-out flex items-center justify-center overflow-hidden"
       style={{ backgroundColor: discounts[index].bg }}
     >
-      {/* The parent div (w-full overflow-hidden) ensures that even if 
-        the text moves, it stays within the screen edges.
-      */}
       <div className="w-full flex justify-center items-center overflow-hidden relative h-6">
         <p 
           key={index} 
-          className="animate-slide-left absolute whitespace-nowrap font-bold uppercase tracking-[0.1em] sm:tracking-[0.25em] text-[10px] sm:text-[11px] md:text-xs px-4"
+          className="animate-fade-in-slide absolute whitespace-nowrap font-bold uppercase tracking-[0.1em] sm:tracking-[0.25em] text-[10px] sm:text-[11px] md:text-xs px-4"
           style={{ color: discounts[index].color }}
         >
           {discounts[index].text}
         </p>
       </div>
       
-      <style jsx>{`
-        .animate-slide-left {
-          animation: slideLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      <style>{`
+        .animate-fade-in-slide {
+          /* Smoother, slower animation */
+          animation: fadeSlide 1s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        @keyframes slideLeft {
-          from { transform: translateX(100%); opacity: 0; }
+        @keyframes fadeSlide {
+          from { transform: translateX(20px); opacity: 0; }
           to { transform: translateX(0); opacity: 1; }
         }
       `}</style>

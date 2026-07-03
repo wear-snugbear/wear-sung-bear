@@ -33,9 +33,9 @@ export default function Hero() {
 
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-10 md:flex-row md:gap-8 relative z-10">
         <div className="flex max-w-xl flex-col items-start space-y-5 text-left">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FFEAE8] px-4 py-1.5 text-xs font-bold tracking-wide text-[#FF8580]">
-            <span>♥</span> SNUG COMMUNITY <span>♥</span>
-          </div>
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#FFEAE8] px-6 py-2.5 text-sm md:text-base font-bold tracking-wide text-[#FF8580]">
+  <span>♥</span> #WEARSNUG <span>♥</span>
+</div>
           <h1 className="font-serif text-4xl font-extrabold tracking-tight text-[#4D3A2A] sm:text-5xl md:text-6xl lg:leading-[1.15]">
             Wear Your Mood. <br />
             <span className="text-[#FF8580]">Live Your Story.</span>

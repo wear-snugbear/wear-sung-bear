@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../../context/CartContext"; // 🛒 Shared cart hook
@@ -231,9 +231,19 @@ function FilterSidebar({ selectedCategory, setSelectedCategory }) {
 // ==========================================
 // 5. ENHANCED PRODUCT CARD COMPONENT (UPDATED)
 // ==========================================
-function ProductCard({ product, index, onQuickView }) {
+function ProductCard({ product, index, onQuickView, activeFilterSize }) { // Add activeFilterSize prop
   const { addToCart } = useCart();
-  const [selectedCardSize, setSelectedCardSize] = useState("M");
+  
+  // Initialize with activeFilterSize if it exists, otherwise fall back to 'M'
+  const [selectedCardSize, setSelectedCardSize] = useState(activeFilterSize || "M");
+
+  // Sync internal state when the activeFilterSize prop changes
+  useEffect(() => {
+    if (activeFilterSize) {
+      setSelectedCardSize(activeFilterSize);
+    }
+  }, [activeFilterSize]);
+
   const [isAdded, setIsAdded] = useState(false);
   const { wishlist, toggleWishlist } = useWishlist();
 
@@ -261,31 +271,30 @@ function ProductCard({ product, index, onQuickView }) {
       */}
       {/* HEART BUTTON LAYER */}
 {/* HEART BUTTON LAYER */}
-{/* HEART BUTTON LAYER - PLACED AT THE VERY END OF THE PARENT */}
+{/* --- UPDATED HEART BUTTON LAYER --- */}
 {!product.isComingSoon && (
   <div 
-    className="absolute top-4 right-4 z-[999]" 
-    style={{ touchAction: 'none' }} // Prevents browser panning interference
+    className="absolute top-4 right-4 z-[999]"
+    // This allows the button to be tapped even if parent has pointer-events issues
+    style={{ position: 'absolute', pointerEvents: 'auto' }} 
   >
-    {/* Enlarge the clickable area without changing visual size */}
-    <div 
-      className="p-4 cursor-pointer" 
+    <button
+      type="button"
+      className={`h-12 w-12 flex items-center justify-center rounded-full bg-white/95 backdrop-blur-md shadow-xl border border-[#6D442C]/10 transition-all active:scale-90 ${
+        isLiked ? "text-[#FF4D6D]" : "text-[#FFB7B2]"
+      }`}
       onClick={(e) => {
+        e.preventDefault(); // Crucial for mobile to stop tap-to-focus/scroll interference
         e.stopPropagation();
-        e.preventDefault();
         toggleWishlist(product);
       }}
+      // Ensure the button is fully opaque and not covered by hidden parent overflows
+      style={{ isolation: 'isolate' }}
     >
-      <div 
-        className={`h-10 w-10 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md border border-[#6D442C]/10 transition-all ${
-          isLiked ? "text-[#FF4D6D]" : "text-[#FFB7B2]"
-        }`}
-      >
-        <span className="text-xl leading-none select-none">
-          {isLiked ? "♥" : "♡"}
-        </span>
-      </div>
-    </div>
+      <span className="text-2xl leading-none select-none">
+        {isLiked ? "♥" : "♡"}
+      </span>
+    </button>
   </div>
 )}
 
@@ -493,108 +502,165 @@ function QuickViewModal({ product, onClose }) {
 export default function Collections() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentSort, setCurrentSort] = useState("featured");
-  const [activeQuickView, setActiveQuickView] = useState(null);
-  const [searchParams] = useSearchParams();
-  const filterFromUrl = searchParams.get("filter") || "All Collections";
-  const [selectedCategory, setSelectedCategory] = useState(filterFromUrl);
+  
+  // States for Modals and Filters
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState(null); // Added this missing state
+  const [selectedCategory, setSelectedCategory] = useState("All Collections");
+  const [selectedSort, setSelectedSort] = useState("featured");
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [defaultSelectedSize, setDefaultSelectedSize] = useState("M");
 
-  // CORRECTED: Single useEffect to fetch data
+  const categories = ["All Collections", "Snugbear Basics", "Moody Collection", "Delulu Diaries"];
+  const availableSizes = ["S", "M", "L", "XL"];
+  const [activeFilterSize, setActiveFilterSize] = useState(null);
+
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        setLoading(true);
-        // Use the Render backend URL
-        const API_URL = "https://snugbear-backend.onrender.com/api/products";
-        
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error(`Server returned ${response.status}`);
-
+        const response = await fetch("https://snugbear-backend.onrender.com/api/products");
         const data = await response.json();
         setProducts(data);
-      } catch (err) {
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) { console.error("Error loading products:", err); }
+      finally { setLoading(false); }
     };
+    fetchData();
+  }, []);
 
-    fetchProducts();
-  }, []); // Only runs once on mount
+  const filteredProducts = useMemo(() => {
+  let result = [...products];
 
-  const filteredProducts = products
-    .filter((product) => {
-      return (
-        selectedCategory === "All Collections" ||
-        product.collectionName === selectedCategory
-      );
-    })
-    .sort((a, b) => {
-      if (currentSort === "low-high") return a.price - b.price;
-      if (currentSort === "high-low") return b.price - a.price;
-      return 0;
-    });
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFFBF9] text-[#4D3A2A]">
-        <div className="mb-2 text-2xl">🧺</div>
-        <p className="text-sm font-medium tracking-wide">
-          Loading Cozy Items... please hold your snuggles ✨
-        </p>
-      </div>
-    );
+  if (selectedCategory !== "All Collections") {
+    result = result.filter((p) => p.collectionName === selectedCategory);
   }
 
+  // Update this part to match the single activeFilterSize
+  if (activeFilterSize) {
+    result = result.filter((p) => p.sizes.includes(activeFilterSize));
+  }
+  
+  // ... rest of your sorting logic
+  return result;
+}, [products, selectedCategory, selectedSort, activeFilterSize]);
+
+  const toggleSize = (size) => {
+    setSelectedSizes(prev => prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]);
+  };
+
   return (
-    <div className="relative min-h-screen w-full bg-[#FFFBF9] px-4 py-12 md:px-8 z-10 overflow-hidden">
-      <BackgroundAnimations />
+    <div className="relative min-h-screen bg-[#FFFBF9] pt-8 pb-20">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+        <h1 className="font-serif text-4xl font-black text-[#4D3A2A] mb-8">Collections</h1>
 
-      <div className="relative max-w-7xl mx-auto z-10 grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-1">
-          <div className="sticky top-6">
-            <FilterSidebar
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
-          </div>
-        </div>
+        <button 
+          onClick={() => setIsFilterOpen(true)}
+          className="w-full md:w-auto px-6 py-3 bg-[#6D442C] text-white rounded-xl font-bold text-xs shadow-lg hover:bg-[#4D3A2A] transition-all"
+        >
+          Filter & Sort 🎀
+        </button>
 
-        <div className="lg:col-span-3 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-[#6D442C]/8 pb-4">
-            <div>
-              <h2 className="font-serif text-2xl sm:text-3xl font-black text-[#3A2A1D]">
-                {selectedCategory}
-              </h2>
-              <p className="text-[11px] font-medium text-[#7A6B5C] mt-1">
-                Showing {filteredProducts.length} cozy result
-                {filteredProducts.length === 1 ? "" : "s"}
-              </p>
-            </div>
-            <SortDropdown currentSort={currentSort} setCurrentSort={setCurrentSort} />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredProducts.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                index={index}
-                onQuickView={(p) => setActiveQuickView(p)}
-              />
-            ))}
-          </div>
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredProducts.map((p, i) => (
+            <ProductCard 
+  key={p.id} 
+  product={p} 
+  index={i} 
+  activeFilterSize={activeFilterSize} // Pass the active state here
+  onQuickView={(product) => setQuickViewProduct(product)} 
+/>
+          ))}
         </div>
       </div>
 
+      {/* QUICK VIEW MODAL */}
       <AnimatePresence>
-        {activeQuickView && (
-          <QuickViewModal
-            product={activeQuickView}
-            onClose={() => setActiveQuickView(null)}
+        {quickViewProduct && (
+          <QuickViewModal 
+            product={quickViewProduct} 
+            onClose={() => setQuickViewProduct(null)} 
           />
         )}
       </AnimatePresence>
+
+      {/* FILTER DRAWER */}
+      {/* FILTER DRAWER */}
+<AnimatePresence>
+  {isFilterOpen && (
+    <motion.div 
+      initial={{ x: "100%" }} 
+      animate={{ x: 0 }} 
+      exit={{ x: "100%" }}
+      transition={{ type: "spring", damping: 25, stiffness: 200 }}
+      className="fixed inset-0 z-[100] bg-white p-6 overflow-y-auto w-full md:max-w-md shadow-2xl"
+    >
+      <div className="flex justify-between items-center mb-6 border-b pb-4">
+        <h2 className="font-serif font-black text-xl">Filter & Sort</h2>
+        <button onClick={() => setIsFilterOpen(false)} className="text-2xl font-bold">✕</button>
+      </div>
+
+      <div className="space-y-8">
+        {/* Category Filter */}
+        <div>
+          <p className="font-bold text-sm mb-3">Category</p>
+          <div className="flex flex-col gap-2">
+            {categories.map(c => (
+              <button 
+                key={c} 
+                onClick={() => setSelectedCategory(c)} 
+                className={`text-left p-3 rounded-xl text-sm transition-all ${
+                  selectedCategory === c ? "bg-[#6D442C] text-white font-bold" : "bg-gray-50 hover:bg-[#FFE5EC]"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Size Filter Drawer Section */}
+<div>
+  <p className="font-bold text-sm mb-3">Size</p>
+  <div className="flex gap-2">
+    {availableSizes.map(sz => (
+      <button 
+        key={sz} 
+        onClick={() => setActiveFilterSize(activeFilterSize === sz ? null : sz)} 
+        className={`h-12 w-12 border rounded-xl font-bold transition-all ${
+          activeFilterSize === sz 
+            ? "bg-[#6D442C] text-white border-[#6D442C]" 
+            : "bg-white border-gray-200 hover:border-[#6D442C]"
+        }`}
+      >
+        {sz}
+      </button>
+    ))}
+  </div>
+</div>
+
+        {/* Sort Options */}
+        <div>
+          <p className="font-bold text-sm mb-3">Sort By</p>
+          <select 
+            value={selectedSort} 
+            onChange={(e) => setSelectedSort(e.target.value)} 
+            className="w-full p-3 border border-gray-200 rounded-xl bg-white font-medium text-sm"
+          >
+            <option value="featured">Featured</option>
+            <option value="low-high">Price: Low to High</option>
+            <option value="high-low">Price: High to Low</option>
+          </select>
+        </div>
+
+        <button 
+          onClick={() => setIsFilterOpen(false)} 
+          className="w-full py-4 bg-[#FF8580] text-white rounded-2xl font-bold hover:bg-[#FF6B6B] transition-colors"
+        >
+          Apply Filters
+        </button>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
     </div>
   );
 }
