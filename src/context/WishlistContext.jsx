@@ -50,30 +50,30 @@ export const WishlistProvider = ({ children }) => {
     fetchWishlist();
   }, [user]);
 
-  // 3. Toggle Function (Sync with MongoDB)
-  // Example of how your WishlistContext.jsx should look:
-const toggleWishlist = async (product) => {
-  const isLiked = wishlist.some((item) => item.id === product.id);
+  const toggleWishlist = async (product) => {
+  if (!user || !user.email) {
+    alert("Please log in to add items to your wishlist!");
+    return;
+  }
+
+  const isLiked = wishlist.some((item) => String(item.id) === String(product.id));
   const updatedWishlist = isLiked 
-    ? wishlist.filter((item) => item.id !== product.id) 
+    ? wishlist.filter((item) => String(item.id) !== String(product.id)) 
     : [...wishlist, product];
 
-  // Update local state immediately for UI responsiveness
   setWishlist(updatedWishlist);
 
   try {
-    // Ensure the email matches exactly what is in your database
-    await axios.post('http://localhost:5000/api/wishlist/update', {
-      email: "ruhela.vibhu2005@gmail.com", 
+    // FIX: Use the dynamic user email from state
+    await axios.post('https://snugbear-backend-dosj.onrender.com/api/wishlist/update', {
+      email: user.email, 
       items: updatedWishlist
     });
   } catch (error) {
     console.error("Error syncing wishlist:", error);
-    // Revert state if the API call fails
     setWishlist(wishlist); 
   }
 };
-
   return (
     <WishlistContext.Provider value={{ wishlist, toggleWishlist, loading }}>
       {children}

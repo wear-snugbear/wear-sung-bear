@@ -249,7 +249,8 @@ function ProductCard({ product, index, onQuickView, activeFilterSize }) { // Add
   const { wishlist, toggleWishlist } = useWishlist();
 
   // Ensure consistent ID comparison
-  const isLiked = wishlist?.some((item) => String(item.id) === String(product.id));
+  // Change this line (approx line 224) to be safer:
+const isLiked = Array.isArray(wishlist) && wishlist.some((item) => String(item.id) === String(product.id));
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -270,29 +271,23 @@ function ProductCard({ product, index, onQuickView, activeFilterSize }) { // Add
         HEART BUTTON LAYER 
         Placed outside the main content flow to ensure it captures clicks first.
       */}
-      {/* HEART BUTTON LAYER */}
-{/* HEART BUTTON LAYER */}
-{/* --- UPDATED HEART BUTTON LAYER --- */}
+      {/* --- UPDATED HEART BUTTON LAYER --- */}
 {!product.isComingSoon && (
   <div 
     className="absolute top-4 right-4 z-[999]"
-    // This allows the button to be tapped even if parent has pointer-events issues
     style={{ position: 'absolute', pointerEvents: 'auto' }} 
   >
     <button
       type="button"
-      className={`h-12 w-12 flex items-center justify-center rounded-full bg-white/95 backdrop-blur-md shadow-xl border border-[#6D442C]/10 transition-all active:scale-90 ${
-        isLiked ? "text-[#FF4D6D]" : "text-[#FFB7B2]"
+      className={`h-10 w-10 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-md shadow-lg border border-[#6D442C]/10 transition-all active:scale-90 ${
+        isLiked ? "text-[#FF4D6D] bg-[#FFE5EC]" : "text-[#FFB7B2] hover:text-[#FF4D6D]"
       }`}
       onClick={(e) => {
-        e.preventDefault(); // Crucial for mobile to stop tap-to-focus/scroll interference
-        e.stopPropagation();
+        e.stopPropagation(); // Stops event from bubbling to parent (the image wrapper)
         toggleWishlist(product);
       }}
-      // Ensure the button is fully opaque and not covered by hidden parent overflows
-      style={{ isolation: 'isolate' }}
     >
-      <span className="text-2xl leading-none select-none">
+      <span className="text-xl leading-none select-none">
         {isLiked ? "♥" : "♡"}
       </span>
     </button>
@@ -311,10 +306,13 @@ function ProductCard({ product, index, onQuickView, activeFilterSize }) { // Add
         <SparkleEffect containerId={product.id} />
 
         {/* CLICKABLE IMAGE WRAPPER */}
-        <div
-          className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#FFF9F6] cursor-pointer"
-          onClick={() => !product.isComingSoon && onQuickView(product)}
-        >
+       <div
+  className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#FFF9F6] cursor-pointer"
+  onClick={(e) => {
+    // Check if the target is the container itself, not the heart button
+    if (!product.isComingSoon) onQuickView(product);
+  }}
+>
           <img
             src={product.image}
             alt={product.name}

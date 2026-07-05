@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext"; // Ensure this path is correct
+import { useAuth } from "../../context/AuthContext";
 
 export default function TrackOrder() {
-  const { user } = useAuth(); // Get user from AuthContext
+  const { user } = useAuth();
   
-  // Initialize email state with logged-in user's email
   const [email, setEmail] = useState(user?.email || "");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -13,21 +12,32 @@ export default function TrackOrder() {
   // Automatically fetch when component mounts if user is logged in
   useEffect(() => {
     if (user?.email) {
+      setEmail(user.email); // Sync state if user logs in
       fetchOrders(user.email);
     }
   }, [user]);
 
   const fetchOrders = async (targetEmail = email) => {
     if (!targetEmail) return;
+    
     setLoading(true);
     setSearched(true);
+    
     try {
-      // Note: Ensure your backend URL is correct (using 127.0.0.1 or your production URL)
-      const response = await fetch(`http://127.0.0.1:5000/api/orders/${targetEmail}`);
+      // FIX 1: Use your deployed production URL
+      // FIX 2: Use encodeURIComponent to handle special characters in emails
+      const encodedEmail = encodeURIComponent(targetEmail);
+      const response = await fetch(`https://snugbear-backend-dosj.onrender.com/api/orders/${encodedEmail}`);
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch orders");
+      }
+      
       const data = await response.json();
       setOrders(data);
     } catch (error) {
       console.error("Error fetching orders:", error);
+      setOrders([]); // Clear orders on error
     } finally {
       setLoading(false);
     }
@@ -46,7 +56,6 @@ export default function TrackOrder() {
       <div className="max-w-xl mx-auto">
         <h2 className="text-3xl font-black text-[#4D3A2A] mb-2 text-center">Track Your Snuggles 📦</h2>
         
-        {/* Dynamic header message */}
         <p className="text-center text-[#7A6B5C] mb-8 text-sm">
           {user ? `Showing orders for: ${email}` : "Enter the email used during checkout to see your order status."}
         </p>
@@ -54,7 +63,7 @@ export default function TrackOrder() {
         <div className="flex gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-[#6D442C]/10">
           <input 
             type="email" 
-            value={email} // Controlled input
+            value={email} 
             placeholder="e.g., hello@example.com" 
             className="flex-1 p-3 bg-transparent outline-none text-sm font-medium"
             onChange={(e) => setEmail(e.target.value)}
@@ -64,14 +73,14 @@ export default function TrackOrder() {
             onClick={() => fetchOrders()} 
             className="bg-[#6D442C] text-white px-6 py-3 rounded-xl font-black hover:bg-[#4D3A2A] transition-all"
           >
-            Track
+            {loading ? "..." : "Track"}
           </button>
         </div>
 
         {loading && <p className="text-center text-[#7A6B5C]">Looking for your orders... 🧸</p>}
         
         {!loading && searched && orders.length === 0 && (
-          <p className="text-center text-[#7A6B5C]">No orders found for {email}.</p>
+          <p className="text-center text-[#7A6B5C]">No orders found for this email.</p>
         )}
         
         <div className="space-y-4">

@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
-  // 1. Destructure clearCart from useCart
   const { cart, clearCart } = useCart();
+console.log("Is clearCart a function?", typeof clearCart);
   const { user } = useAuth();
   const navigate = useNavigate();
   
@@ -26,34 +26,44 @@ export default function Checkout() {
   const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleProceedToPayment = async () => {
-    if (!formData.name || !formData.email || !formData.address || !formData.phone) {
-      alert("Please fill in all delivery details.");
-      return;
+  if (!formData.name || !formData.email || !formData.address || !formData.phone) {
+    alert("Please fill in all delivery details.");
+    return;
+  }
+  
+  setLoading(true);
+  try {
+    const response = await fetch("https://snugbear-backend-dosj.onrender.com/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...formData, cart, paymentMethod, total }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      // Throw the error so the catch block handles it
+      throw new Error(result.message || "Payment failed");
     }
-    setLoading(true);
-    try {
-      const response = await fetch("https://snugbear-backend-dosj.onrender.com/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, cart, paymentMethod, total }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error);
-      
-      alert(`Success! Tracking ID: ${result.tracking_id}`);
-      
-      // 2. Clear the cart context so it's empty when user hits home
-      clearCart(); 
-      
-      // 3. Redirect to home page
-      navigate("/"); 
-      
-    } catch (error) {
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+
+    // SUCCESS FLOW:
+    // 1. Show the confirmation
+    alert(`Success! Tracking ID: ${result.tracking_id}`);
+    
+    // 2. Clear cart
+    clearCart(); 
+    
+    // 3. Force redirect using window.location to ensure a fresh state
+    window.location.href = "/"; 
+    
+  } catch (error) {
+    console.error("Checkout Error:", error);
+    // Show the actual error message if possible
+    alert(`Something went wrong: ${error.message}. Please check your internet or try again.`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#FFFDFB] py-12 px-4 sm:px-6 lg:px-8">

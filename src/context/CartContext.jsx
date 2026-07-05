@@ -48,11 +48,28 @@ export function CartProvider({ children }) {
     );
   };
 
+  // --- ADDED THIS FUNCTION ---
+  // Resets the cart to an empty array
+  const clearCart = () => {
+    setCart([]);
+  };
+
   // Easily get total quantity for the navbar badge
   const totalItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, updateQuantity, removeFromCart, totalItemsCount }}>
+    // --- UPDATED VALUE OBJECT ---
+    // Added 'clearCart' so it is available in any component that calls useCart()
+    <CartContext.Provider 
+      value={{ 
+        cart, 
+        addToCart, 
+        updateQuantity, 
+        removeFromCart, 
+        clearCart, 
+        totalItemsCount 
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
