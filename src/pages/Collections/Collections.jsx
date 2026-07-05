@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "../../context/CartContext"; // 🛒 Shared cart hook
 import { useWishlist } from "../../context/WishlistContext";
+import Reviews from "../../components/Reviews/Reviews";
 
 // ==========================================
 // 1. COMBINED GLOBAL BACKGROUND ANIMATION LAYER
@@ -395,107 +396,156 @@ function ProductCard({ product, index, onQuickView, activeFilterSize }) { // Add
 // ==========================================
 // 6. QUICK VIEW OVERLAY MODAL SYSTEM
 // ==========================================
-function QuickViewModal({ product, onClose }) {
+// --- Helper Components ---
+function Accordion({ title, children }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-[#6D442C]/10 py-4">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center text-xs font-bold text-[#4D3A2A] uppercase tracking-wider"
+      >
+        {title}
+        <span className="text-[#A08A76] text-lg leading-none">{isOpen ? "−" : "+"}</span>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-4 text-xs text-[#7A6B5C] leading-relaxed">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+// ==========================================
+// 6. UPDATED QUICK VIEW MODAL
+// ==========================================
+export function QuickViewModal({ product, onClose, allProducts, onProductSelect }) {
   const { addToCart } = useCart();
-  const [modalSize, setModalSize] = useState("M");
+  const [modalSize, setModalSize] = useState(product.sizes?.[0] || "M");
+  
+  // 1. Create a ref for the scrollable container
+  const scrollRef = React.useRef(null);
+
+  useEffect(() => {
+    setModalSize(product.sizes?.[0] || "M");
+    
+    // 2. Reset scroll position to top whenever product changes
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [product]); 
+
   const [isAdded, setIsAdded] = useState(false);
 
-  if (!product) return null;
+  // Get 5 random products for recommendation
+  const recommendations = allProducts
+    .filter((p) => p.id !== product.id)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 5);
 
   const handleModalAdd = () => {
     addToCart(product, modalSize);
     setIsAdded(true);
-    setTimeout(() => {
-      setIsAdded(false);
-      onClose();
-    }, 1000);
+    setTimeout(() => { setIsAdded(false); }, 1000);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="absolute inset-0 bg-[#2B1C13]/40 backdrop-blur-sm"
-      />
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-[#2B1C13]/40 backdrop-blur-sm" />
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 16 }}
-        className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-[0_24px_60px_rgba(43,28,19,0.35)] relative z-10 grid grid-cols-1 md:grid-cols-2 border border-[#6D442C]/12"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative z-10"
       >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 h-8 w-8 rounded-full bg-[#FFF9F6] border border-[#6D442C]/10 text-sm font-bold text-[#7A6B5C] hover:text-[#FF4D6D] z-20 flex items-center justify-center shadow-xs"
-        >
-          ✕
-        </button>
+        <button onClick={onClose} className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-[#4D3A2A] z-20">✕</button>
 
-        <div className="bg-[#FFF9F6] p-6 flex items-center justify-center aspect-square md:aspect-auto">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-auto max-h-[300px] object-contain rounded-2xl"
-          />
-        </div>
-
-        <div className="p-6 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#FF4D6D] bg-[#FFE5EC] px-2 py-0.5 rounded-md inline-block">
-              {product.collectionName}
-            </span>
-            <h2 className="font-serif text-xl font-black text-[#4D3A2A] mt-1.5">
-              {product.name}
-            </h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-lg font-black text-[#6D442C]">₹{product.price}</span>
-              <span className="text-xs text-[#7A6B5C]/50 line-through">₹{product.mrp}</span>
-            </div>
-            <p className="text-xs text-[#7A6B5C] leading-relaxed mt-3">{product.description}</p>
+        {/* 3. Attach the ref to this container */}
+        <div className="flex-1 overflow-y-auto" ref={scrollRef}>
+          <div className="bg-[#FFF9F6] p-8 flex items-center justify-center">
+            <img src={product.image} alt={product.name} className="w-full max-w-sm object-contain rounded-xl" />
           </div>
 
-          <div className="space-y-3">
-            <div>
-              <span className="text-xs font-bold text-[#4D3A2A] block mb-1.5">
-                Selected Variant Size:
-              </span>
+          <div className="p-6">
+            <h2 className="font-serif text-2xl font-black text-[#4D3A2A]">{product.name}</h2>
+            <p className="text-xl font-bold text-[#6D442C] mt-1">₹{product.price}</p>
+
+            <div className="mt-6">
+              <span className="text-xs font-bold text-[#4D3A2A] block mb-2 uppercase">Select Size:</span>
               <div className="flex gap-2">
-                {product.sizes.map((sz) => (
-                  <button
-                    key={sz}
-                    onClick={() => setModalSize(sz)}
-                    className={`h-8 w-9 rounded-xl text-xs font-bold border transition-all ${
-                      modalSize === sz
-                        ? "bg-[#6D442C] text-white border-[#6D442C]"
-                        : "bg-white text-[#7A6B5C] border-[#6D442C]/15 hover:border-[#FF4D6D]"
-                    }`}
-                  >
+                {product.sizes?.map((sz) => (
+                  <button key={sz} onClick={() => setModalSize(sz)} className={`h-10 w-12 rounded-xl text-sm font-bold border transition-all ${modalSize === sz ? "bg-[#6D442C] text-white" : "border-[#6D442C]/15"}`}>
                     {sz}
                   </button>
                 ))}
               </div>
             </div>
 
-            <button
-              onClick={handleModalAdd}
-              className={`w-full py-2.5 rounded-xl text-xs font-bold tracking-wide transition-colors ${
-                isAdded
-                  ? "bg-[#E2F7ED] text-[#1FA66A]"
-                  : "bg-[#6D442C] text-white hover:bg-[#4D3A2A]"
-              }`}
-            >
-              {isAdded ? "Added to your Snuggle List! 🎀" : "Add Selected Size to Cart 🧸"}
-            </button>
+            {/* Expanded Product Info */}
+            <div className="mt-8 space-y-2">
+              <Accordion title="Description">
+                <p className="text-sm">{product.description || "Designed for the ultimate cozy aesthetic. Oversized fit, premium cotton blend."}</p>
+              </Accordion>
+              <Accordion title="Materials">
+                <p className="text-sm">95% Premium Cotton, 5% Elastane for extra stretch and comfort.</p>
+              </Accordion>
+              <Accordion title="Wash Care">
+                <p className="text-sm">Machine wash cold inside out. Tumble dry low. Do not bleach.</p>
+              </Accordion>
+              <Accordion title="Customer Reviews">
+  <Reviews productId={product.id} />
+</Accordion>
+            </div>
+
+            {/* Recommendations Section */}
+<div className="mt-10 border-t pt-6">
+  <h3 className="text-sm font-black text-[#4D3A2A] uppercase tracking-wider mb-4">
+    You Might Also Like 🧸
+  </h3>
+  <div className="grid grid-cols-2 gap-4 pb-4">
+      {recommendations.map((rec) => (
+        <div 
+          key={rec.id} 
+          className="group cursor-pointer ..."
+          onClick={() => {
+            // This now triggers the parent to swap the product
+            onProductSelect(rec);
+          }}
+        >
+        <div className="aspect-square w-full overflow-hidden rounded-lg">
+          <img 
+            src={rec.image} 
+            alt={rec.name} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+          />
+        </div>
+        <div className="px-1">
+          <p className="text-[11px] font-bold text-[#4D3A2A] truncate">{rec.name}</p>
+          <p className="text-[10px] font-bold text-[#6D442C]/70">₹{rec.price}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
           </div>
+        </div>
+
+        <div className="p-4 border-t bg-white">
+          <button onClick={handleModalAdd} className="w-full py-4 bg-[#6D442C] text-white rounded-xl font-bold hover:bg-[#4D3A2A] transition-colors">
+            {isAdded ? "Added to Cart! 🎀" : "Add to Cart"}
+          </button>
         </div>
       </motion.div>
     </div>
   );
 }
-
 // ==========================================
 // 7. MAIN COLLECTIONS WRAPPER COMPONENT
 // ==========================================
@@ -547,6 +597,9 @@ export default function Collections() {
     setSelectedSizes(prev => prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]);
   };
 
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="relative min-h-screen bg-[#FFFBF9] pt-8 pb-20">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
@@ -560,27 +613,36 @@ export default function Collections() {
         </button>
 
         <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((p, i) => (
-            <ProductCard 
-  key={p.id} 
-  product={p} 
-  index={i} 
-  activeFilterSize={activeFilterSize} // Pass the active state here
-  onQuickView={(product) => setQuickViewProduct(product)} 
-/>
-          ))}
+        {filteredProducts.map((p, i) => (
+  <ProductCard 
+    key={`${p.id}-${activeFilterSize}`} // 👈 ADDED: Changing key forces re-mount when product or size changes
+    product={p} 
+    index={i} 
+    activeFilterSize={activeFilterSize}
+    onQuickView={(product) => setQuickViewProduct(product)} 
+  />
+))}
         </div>
+      </div>
+      <div className="mt-24 mb-10">
+        <div className="text-center mb-10">
+           <h3 className="text-2xl font-bold text-[#6D442C]">Loved by our Community 🧸</h3>
+        </div>
+        <Reviews onlyImages={true} />
       </div>
 
       {/* QUICK VIEW MODAL */}
       <AnimatePresence>
-        {quickViewProduct && (
-          <QuickViewModal 
-            product={quickViewProduct} 
-            onClose={() => setQuickViewProduct(null)} 
-          />
-        )}
-      </AnimatePresence>
+  {quickViewProduct && (
+    <QuickViewModal 
+      product={quickViewProduct} 
+      allProducts={products} 
+      onClose={() => setQuickViewProduct(null)}
+      // Pass the setter here so the modal can trigger a change
+      onProductSelect={(newProduct) => setQuickViewProduct(newProduct)} 
+    />
+  )}
+</AnimatePresence>
 
       {/* FILTER DRAWER */}
       {/* FILTER DRAWER */}

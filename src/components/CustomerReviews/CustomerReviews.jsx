@@ -25,6 +25,7 @@ export default function CustomerReviews() {
     const interval = setInterval(() => {
       if (scrollRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        // Reset to start if at the end, otherwise scroll forward
         if (scrollLeft + clientWidth >= scrollWidth - 10) {
           scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
         } else {
@@ -79,10 +80,10 @@ export default function CustomerReviews() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         @media (max-width: 1024px) { [data-review-card] { min-width: calc(50% - 16px) !important; } }
-        @media (max-width: 640px) { [data-scroll-container] { gap: 1rem !important; } [data-review-card] { min-width: 100% !important; } }
+        @media (max-width: 640px) { [data-review-card] { min-width: 100% !important; } }
       `}</style>
     </section>
   );

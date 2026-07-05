@@ -1,17 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext"; // Ensure this path is correct
 
 export default function TrackOrder() {
-  const [email, setEmail] = useState("");
+  const { user } = useAuth(); // Get user from AuthContext
+  
+  // Initialize email state with logged-in user's email
+  const [email, setEmail] = useState(user?.email || "");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const fetchOrders = async () => {
-    if (!email) return;
+  // Automatically fetch when component mounts if user is logged in
+  useEffect(() => {
+    if (user?.email) {
+      fetchOrders(user.email);
+    }
+  }, [user]);
+
+  const fetchOrders = async (targetEmail = email) => {
+    if (!targetEmail) return;
     setLoading(true);
     setSearched(true);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/orders/${email}`);
+      // Note: Ensure your backend URL is correct (using 127.0.0.1 or your production URL)
+      const response = await fetch(`http://127.0.0.1:5000/api/orders/${targetEmail}`);
       const data = await response.json();
       setOrders(data);
     } catch (error) {
@@ -21,7 +33,6 @@ export default function TrackOrder() {
     }
   };
 
-  // Helper to determine status color and icon
   const getStatusVisuals = (status) => {
     switch (status) {
       case 'Shipped': return { color: 'text-blue-600', bg: 'bg-blue-50', icon: '🚚' };
@@ -34,18 +45,23 @@ export default function TrackOrder() {
     <div className="min-h-screen bg-[#FFFBF9] p-8">
       <div className="max-w-xl mx-auto">
         <h2 className="text-3xl font-black text-[#4D3A2A] mb-2 text-center">Track Your Snuggles 📦</h2>
-        <p className="text-center text-[#7A6B5C] mb-8 text-sm">Enter the email used during checkout to see your order status.</p>
+        
+        {/* Dynamic header message */}
+        <p className="text-center text-[#7A6B5C] mb-8 text-sm">
+          {user ? `Showing orders for: ${email}` : "Enter the email used during checkout to see your order status."}
+        </p>
         
         <div className="flex gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-[#6D442C]/10">
           <input 
             type="email" 
+            value={email} // Controlled input
             placeholder="e.g., hello@example.com" 
             className="flex-1 p-3 bg-transparent outline-none text-sm font-medium"
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchOrders()}
           />
           <button 
-            onClick={fetchOrders} 
+            onClick={() => fetchOrders()} 
             className="bg-[#6D442C] text-white px-6 py-3 rounded-xl font-black hover:bg-[#4D3A2A] transition-all"
           >
             Track
@@ -55,7 +71,7 @@ export default function TrackOrder() {
         {loading && <p className="text-center text-[#7A6B5C]">Looking for your orders... 🧸</p>}
         
         {!loading && searched && orders.length === 0 && (
-          <p className="text-center text-[#7A6B5C]">No orders found for this email. Check the address and try again!</p>
+          <p className="text-center text-[#7A6B5C]">No orders found for {email}.</p>
         )}
         
         <div className="space-y-4">

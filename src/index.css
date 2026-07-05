@@ -9,7 +9,9 @@ html, body {
 }
 
 #root {
-  min-height: 200vh; /* Ensures there is always room to scroll */
+  min-height: 100vh; /* Changed from 200vh */
+  display: flex;
+  flex-direction: column;
 }
 /* Add this to your main CSS file (e.g., index.css) */
 .swiper-pagination-bullets {

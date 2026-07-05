@@ -6,20 +6,31 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Wishlist() {
   const { addToCart } = useCart();
   const [activeQuickView, setActiveQuickView] = useState(null);
-const { wishlist, loading, toggleWishlist } = useWishlist();
-  // Simulate a brief loading state to ensure Firestore data is ready
+  
+  // 1. Get the wishlist from context
+  const { wishlist, loading: contextLoading, toggleWishlist } = useWishlist();
+  
+  // 2. Define a local loading state for this component's transition
+  const [isLocalLoading, setIsLocalLoading] = useState(true);
+
+  // 3. Update the useEffect to use the local setter
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
+    const timer = setTimeout(() => setIsLocalLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) return <div className="p-20 text-center">Loading your cozy treasures... 🧸</div>;
+  // 4. Determine if the page is loading based on BOTH context and local state
+  const isLoading = contextLoading || isLocalLoading;
+
+  if (isLoading) return <div className="p-20 text-center">Loading your cozy treasures... 🧸</div>;
+
   return (
     <div className="min-h-screen bg-[#FFFBF9] px-4 py-12 md:px-8">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-serif text-3xl font-black text-[#4D3A2A] mb-8">My Cozy Wishlist ☁️</h1>
 
-        {loading ? (
+        {/* Use isLoading here instead of loading */}
+        {isLoading ? (
           <div className="text-center py-20 text-[#7A6B5C] animate-pulse">
             Loading your saved cozy items... ✨
           </div>
