@@ -427,14 +427,11 @@ function Accordion({ title, children }) {
 export function QuickViewModal({ product, onClose, allProducts, onProductSelect }) {
   const { addToCart } = useCart();
   const [modalSize, setModalSize] = useState(product.sizes?.[0] || "M");
-  
-  // 1. Create a ref for the scrollable container
+  const [isChartOpen, setIsChartOpen] = useState(false); // State for Size Chart
   const scrollRef = React.useRef(null);
 
   useEffect(() => {
     setModalSize(product.sizes?.[0] || "M");
-    
-    // 2. Reset scroll position to top whenever product changes
     if (scrollRef.current) {
       scrollRef.current.scrollTop = 0;
     }
@@ -442,7 +439,6 @@ export function QuickViewModal({ product, onClose, allProducts, onProductSelect 
 
   const [isAdded, setIsAdded] = useState(false);
 
-  // Get 5 random products for recommendation
   const recommendations = allProducts
     .filter((p) => p.id !== product.id)
     .sort(() => 0.5 - Math.random())
@@ -456,6 +452,13 @@ export function QuickViewModal({ product, onClose, allProducts, onProductSelect 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Size Chart Overlay */}
+      {isChartOpen && (
+        <div className="absolute inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setIsChartOpen(false)}>
+          <img src="/images/size_chart.jpeg" alt="Size Chart" className="max-w-full max-h-[80vh] rounded-2xl shadow-2xl" />
+        </div>
+      )}
+
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-[#2B1C13]/40 backdrop-blur-sm" />
 
       <motion.div
@@ -465,7 +468,6 @@ export function QuickViewModal({ product, onClose, allProducts, onProductSelect 
       >
         <button onClick={onClose} className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-[#4D3A2A] z-20">✕</button>
 
-        {/* 3. Attach the ref to this container */}
         <div className="flex-1 overflow-y-auto" ref={scrollRef}>
           <div className="bg-[#FFF9F6] p-8 flex items-center justify-center">
             <img src={product.image} alt={product.name} className="w-full max-w-sm object-contain rounded-xl" />
@@ -476,7 +478,16 @@ export function QuickViewModal({ product, onClose, allProducts, onProductSelect 
             <p className="text-xl font-bold text-[#6D442C] mt-1">₹{product.price}</p>
 
             <div className="mt-6">
-              <span className="text-xs font-bold text-[#4D3A2A] block mb-2 uppercase">Select Size:</span>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-bold text-[#4D3A2A] uppercase">Select Size:</span>
+                {/* Size Chart Button */}
+                <button 
+                  onClick={() => setIsChartOpen(true)} 
+                  className="text-xs font-bold text-[#6D442C] underline hover:text-[#4D3A2A]"
+                >
+                  View Size Chart
+                </button>
+              </div>
               <div className="flex gap-2">
                 {product.sizes?.map((sz) => (
                   <button key={sz} onClick={() => setModalSize(sz)} className={`h-10 w-12 rounded-xl text-sm font-bold border transition-all ${modalSize === sz ? "bg-[#6D442C] text-white" : "border-[#6D442C]/15"}`}>
@@ -498,40 +509,33 @@ export function QuickViewModal({ product, onClose, allProducts, onProductSelect 
                 <p className="text-sm">Machine wash cold inside out. Tumble dry low. Do not bleach.</p>
               </Accordion>
               <Accordion title="Customer Reviews">
-  <Reviews productId={product.id} />
-</Accordion>
+                <Reviews productId={product.id} />
+              </Accordion>
             </div>
 
             {/* Recommendations Section */}
-<div className="mt-10 border-t pt-6">
-  <h3 className="text-sm font-black text-[#4D3A2A] uppercase tracking-wider mb-4">
-    You Might Also Like 🧸
-  </h3>
-  <div className="grid grid-cols-2 gap-4 pb-4">
-      {recommendations.map((rec) => (
-        <div 
-          key={rec.id} 
-          className="group cursor-pointer ..."
-          onClick={() => {
-            // This now triggers the parent to swap the product
-            onProductSelect(rec);
-          }}
-        >
-        <div className="aspect-square w-full overflow-hidden rounded-lg">
-          <img 
-            src={rec.image} 
-            alt={rec.name} 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-          />
-        </div>
-        <div className="px-1">
-          <p className="text-[11px] font-bold text-[#4D3A2A] truncate">{rec.name}</p>
-          <p className="text-[10px] font-bold text-[#6D442C]/70">₹{rec.price}</p>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
+            <div className="mt-10 border-t pt-6">
+              <h3 className="text-sm font-black text-[#4D3A2A] uppercase tracking-wider mb-4">
+                You Might Also Like 🧸
+              </h3>
+              <div className="grid grid-cols-2 gap-4 pb-4">
+                {recommendations.map((rec) => (
+                  <div 
+                    key={rec.id} 
+                    className="group cursor-pointer"
+                    onClick={() => onProductSelect(rec)}
+                  >
+                    <div className="aspect-square w-full overflow-hidden rounded-lg">
+                      <img src={rec.image} alt={rec.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    </div>
+                    <div className="px-1">
+                      <p className="text-[11px] font-bold text-[#4D3A2A] truncate">{rec.name}</p>
+                      <p className="text-[10px] font-bold text-[#6D442C]/70">₹{rec.price}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
