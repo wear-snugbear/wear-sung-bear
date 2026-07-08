@@ -1,13 +1,28 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
+import { useAuth } from "../../context/AuthContext"; // Assuming you have this
+import UserMenu from "./UserMenu";
 
 export default function BottomNav() {
   const { totalItemsCount } = useCart();
   const { wishlist } = useWishlist();
+  const { user } = useAuth();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-[#F0E4DD] flex justify-around items-center py-2 z-50">
+      {/* User Menu Overlay */}
+      {isUserMenuOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
+          <div className="absolute bottom-full mb-2 right-4 w-64 z-50">
+            <UserMenu onClose={() => setIsUserMenuOpen(false)} isLoggedIn={!!user} />
+          </div>
+        </>
+      )}
+
       {/* Home */}
       <Link to="/" className="flex flex-col items-center text-[#4D3A2A]">
         <span className="text-xl">🏠</span>
@@ -38,14 +53,14 @@ export default function BottomNav() {
         <span className="text-[10px] font-bold mt-0.5">Cart</span>
       </Link>
 
-      {/* Profile */}
-      <Link to="/profile" className="flex flex-col items-center text-[#4D3A2A]">
+      {/* Profile Trigger */}
+      <button onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} className="flex flex-col items-center text-[#4D3A2A]">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
         <span className="text-[10px] font-bold mt-0.5">Profile</span>
-      </Link>
+      </button>
     </div>
   );
 }

@@ -6,28 +6,19 @@ const API_BASE = "https://snugbear-backend-dosj.onrender.com";
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
-  const [foundingEntries, setFoundingEntries] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchOrders = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(`${API_BASE}/api/admin/orders`);
       const data = await response.json();
       setOrders(data);
     } catch (error) { console.error("Error fetching orders:", error); }
+    finally { setIsLoading(false); }
   };
 
-  const fetchFoundingCircle = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/founding-circle`);
-      const data = await res.json();
-      setFoundingEntries(data);
-    } catch (err) { console.error("Error:", err); }
-  };
-
-  useEffect(() => {
-    fetchOrders();
-    fetchFoundingCircle();
-  }, []);
+  useEffect(() => { fetchOrders(); }, []);
 
   const updateStatus = async (orderId, newStatus) => {
     await fetch(`${API_BASE}/api/admin/orders/${orderId}`, {
@@ -40,49 +31,75 @@ export default function AdminDashboard() {
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'Delivered': return "bg-green-100 text-green-700";
-      case 'Shipped': return "bg-blue-100 text-blue-700";
-      default: return "bg-orange-100 text-orange-700";
+      case 'Delivered': return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      case 'Shipped': return "bg-blue-50 text-blue-700 border-blue-200";
+      default: return "bg-amber-50 text-amber-700 border-amber-200";
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFBF9] p-4 md:p-8 lg:p-12">
-      <h1 className="text-3xl md:text-4xl font-black text-[#4D3A2A] mb-8">Admin Dashboard 🧸</h1>
-
-      {/* Orders Section */}
-      <section className="bg-white rounded-3xl border border-[#6D442C]/10 shadow-xl overflow-hidden mb-12">
-        <div className="p-6 border-b border-[#6D442C]/5 flex flex-wrap justify-between items-center gap-4">
-          <h2 className="text-xl md:text-2xl font-black text-[#4D3A2A]">Recent Orders</h2>
-          <button onClick={fetchOrders} className="text-sm font-bold text-[#6D442C] hover:underline">Refresh List</button>
+    <div className="min-h-screen bg-[#F8F7F4] p-6 md:p-12 pt-28">
+      {/* Header */}
+      <div className="flex justify-between items-end mb-8">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-black text-[#2D241E]">Admin Dashboard</h1>
+          <p className="text-[#8B7366] mt-1 font-medium">Manage your store operations</p>
         </div>
-        
-        <div className="overflow-x-auto w-full">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-[#FFF9F6] text-[#6D442C] text-[10px] md:text-xs uppercase tracking-wider">
+        <button 
+          onClick={fetchOrders}
+          className="bg-[#2D241E] text-white px-6 py-2.5 rounded-xl font-bold hover:bg-[#4D3A2A] transition-all shadow-lg"
+        >
+          Refresh Data
+        </button>
+      </div>
+
+      {/* Quick Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {[
+          { label: "Total Orders", value: orders.length },
+          { label: "Pending", value: orders.filter(o => o.status === 'Processing').length },
+          { label: "Delivered", value: orders.filter(o => o.status === 'Delivered').length },
+        ].map((stat, i) => (
+          <div key={i} className="bg-white p-6 rounded-2xl border border-[#E5E0DD] shadow-sm">
+            <p className="text-xs uppercase tracking-widest text-[#8B7366] font-bold">{stat.label}</p>
+            <p className="text-3xl font-black text-[#2D241E] mt-2">{stat.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Main Table Section */}
+      <section className="bg-white rounded-2xl border border-[#E5E0DD] shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-[#FDFBF9] border-b border-[#E5E0DD]">
               <tr>
-                <th className="px-4 py-4 md:px-6">Order ID</th>
-                <th className="px-4 py-4 md:px-6">Customer</th>
-                <th className="px-4 py-4 md:px-6">Total</th>
-                <th className="px-4 py-4 md:px-6">Status</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-[#8B7366] uppercase tracking-wider">Order ID</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-[#8B7366] uppercase tracking-wider">Customer</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-[#8B7366] uppercase tracking-wider">Amount</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-[#8B7366] uppercase tracking-wider">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#6D442C]/5">
-              {orders.map((order) => (
+            <tbody className="divide-y divide-[#E5E0DD]">
+              {isLoading ? (
+                <tr><td colSpan="4" className="p-8 text-center text-[#8B7366]">Loading orders...</td></tr>
+              ) : orders.map((order) => (
                 <React.Fragment key={order.order_id}>
-                  <tr className="hover:bg-[#FFF9F6] cursor-pointer transition-colors" onClick={() => setExpandedOrderId(expandedOrderId === order.order_id ? null : order.order_id)}>
-                    <td className="px-4 py-4 md:px-6 font-mono font-bold text-[#7A6B5C] text-sm">#{order.order_id}</td>
-                    <td className="px-4 py-4 md:px-6">
-                      <div className="font-bold text-[#4D3A2A] text-sm md:text-base">{order.name}</div>
-                      <div className="text-[10px] md:text-xs text-[#7A6B5C]">{order.email}</div>
+                  <tr 
+                    className="hover:bg-[#FFFBF9] transition-colors cursor-pointer group"
+                    onClick={() => setExpandedOrderId(expandedOrderId === order.order_id ? null : order.order_id)}
+                  >
+                    <td className="px-6 py-5 font-mono font-bold text-[#4D3A2A]">#{order.order_id}</td>
+                    <td className="px-6 py-5">
+                      <div className="font-bold text-[#2D241E]">{order.name}</div>
+                      <div className="text-xs text-[#8B7366]">{order.email}</div>
                     </td>
-                    <td className="px-4 py-4 md:px-6 font-black text-[#6D442C]">₹{order.total}</td>
-                    <td className="px-4 py-4 md:px-6">
+                    <td className="px-6 py-5 font-black text-[#2D241E]">₹{order.total}</td>
+                    <td className="px-6 py-5">
                       <select 
                         onClick={(e) => e.stopPropagation()} 
                         onChange={(e) => updateStatus(order.order_id, e.target.value)} 
                         value={order.status}
-                        className={`px-3 py-1 rounded-full text-[10px] md:text-xs font-bold ${getStatusColor(order.status)} border-none cursor-pointer`}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-bold border ${getStatusColor(order.status)} outline-none cursor-pointer`}
                       >
                         <option value="Processing">Processing</option>
                         <option value="Shipped">Shipped</option>
@@ -92,12 +109,24 @@ export default function AdminDashboard() {
                   </tr>
                   <AnimatePresence>
                     {expandedOrderId === order.order_id && (
-                      <motion.tr initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                        <td colSpan="4" className="px-6 py-4 bg-[#FFF9F6] text-xs">
-                          <p className="font-bold text-[#4D3A2A]">Address:</p>
-                          <p className="text-[#7A6B5C] mb-2">{order.address}</p>
-                          <p className="font-bold text-[#4D3A2A]">Items:</p>
-                          {order.cart?.map((i, idx) => <p key={idx}>• {i.name} (x{i.quantity})</p>)}
+                      <motion.tr initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                        <td colSpan="4" className="px-6 py-4 bg-[#FDFBF9] border-b border-[#E5E0DD]">
+                          <div className="grid grid-cols-2 gap-8 text-sm">
+                            <div>
+                              <p className="font-bold text-[#2D241E] mb-2">Delivery Address</p>
+                              <p className="text-[#6B5C54] leading-relaxed">
+                                {typeof order.address === 'object' 
+                                  ? `${order.address.street}, ${order.address.city}, ${order.address.state} - ${order.address.pincode}` 
+                                  : order.address}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="font-bold text-[#2D241E] mb-2">Order Items</p>
+                              {order.cart?.map((i, idx) => (
+                                <p key={idx} className="text-[#6B5C54]">• {i.name} <span className="text-[#8B7366]">x{i.quantity}</span></p>
+                              ))}
+                            </div>
+                          </div>
                         </td>
                       </motion.tr>
                     )}
@@ -106,61 +135,6 @@ export default function AdminDashboard() {
               ))}
             </tbody>
           </table>
-        </div>
-      </section>
-
-      {/* Founding Circle Section */}
-      <section className="bg-white p-6 md:p-8 rounded-3xl border border-[#6D442C]/10 shadow-xl">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-black text-[#4D3A2A]">Founding Circle</h2>
-            <p className="text-[#6D442C] font-bold text-base md:text-lg">{foundingEntries.length} / 50 Spots Filled</p>
-          </div>
-          <button 
-            onClick={async () => {
-              if(window.confirm("Reset the entire cycle? This cannot be undone.")) {
-                await fetch(`${API_BASE}/api/admin/reset-founding-circle`, { method: 'DELETE' });
-                fetchFoundingCircle();
-              }
-            }}
-            className="bg-[#FF8580] text-white px-6 py-2 rounded-full font-bold hover:bg-[#6D442C] transition-all transform hover:scale-105 w-full md:w-auto"
-          >
-            Reset
-          </button>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full bg-gray-100 rounded-full h-4 mb-8 overflow-hidden">
-          <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min((foundingEntries.length / 50) * 100, 100)}%` }} className="bg-[#6D442C] h-full" />
-        </div>
-
-        {/* Grid Responsive Layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {foundingEntries.length === 0 ? (
-            <p className="text-[#7A6B5C] italic">No entries yet...</p>
-          ) : (
-            foundingEntries.map((entry, idx) => (
-              <motion.div 
-                key={idx} 
-                className="p-4 md:p-5 bg-[#FFF9F6] rounded-2xl border border-[#6D442C]/10 hover:border-[#6D442C]/30 transition-all flex flex-col gap-2 shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 flex-shrink-0 rounded-full bg-[#6D442C] text-white flex items-center justify-center font-black text-xs">
-                    {idx + 1}
-                  </div>
-                  <p className="text-sm font-bold text-[#4D3A2A] truncate w-full">{entry.email || "No Email"}</p>
-                </div>
-                
-                <div className="text-[11px] text-[#A68F81] space-y-1 border-t border-[#6D442C]/5 pt-2 mt-1">
-                  <p><strong>Order ID:</strong> {entry.order_id || "N/A"}</p>
-                  <p><strong>Insta:</strong> {entry.instagram && entry.instagram !== "N/A" ? `@${entry.instagram}` : "Not provided"}</p>
-                  <p className="text-[#FF8580] font-bold mt-1">
-                    🎁 Gift: {entry.productName || "Pending"}
-                  </p>
-                </div>
-              </motion.div>
-            ))
-          )}
         </div>
       </section>
     </div>

@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function Hero() {
@@ -34,8 +33,8 @@ export default function Hero() {
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-10 md:flex-row md:gap-8 relative z-10">
         <div className="flex max-w-xl flex-col items-start space-y-5 text-left">
           <div className="inline-flex items-center gap-2 rounded-full bg-[#FFEAE8] px-6 py-2.5 text-sm md:text-base font-bold tracking-wide text-[#FF8580]">
-  <span>♥</span> #WEARSNUG <span>♥</span>
-</div>
+            <span>♥</span> #WEARSNUG <span>♥</span>
+          </div>
           <h1 className="font-serif text-4xl font-extrabold tracking-tight text-[#4D3A2A] sm:text-5xl md:text-6xl lg:leading-[1.15]">
             Wear Your Mood. <br />
             <span className="text-[#FF8580]">Live Your Story.</span>
@@ -46,21 +45,6 @@ export default function Hero() {
               Real fits. Real people. Real SnugBear vibes. <br />
               Tag us <a href="mailto:SNUGBEAROFFICIAL@GMAIL.COM" className="font-semibold text-[#FF8580] hover:underline">@snugbear.official</a> to be featured!
             </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4 pt-1">
-            {/* Login Button (Styled like the Shop Collection button) */}
-            <Link to="/login" className="inline-flex h-12 items-center justify-center rounded-full bg-[#FF8580] px-8 text-sm font-bold text-white shadow-md transition-all hover:bg-[#E5746F]">
-              Login
-            </Link>
-            
-            {/* Sign Up Button (Styled like the Our Story button) */}
-            <Link
-              to="/signup"
-              className="inline-flex h-12 items-center justify-center rounded-full border-2 border-[#4D3A2A]/20 bg-transparent px-8 text-sm font-bold text-[#4D3A2A] transition-all hover:bg-[#4D3A2A]/5"
-            >
-              Sign Up
-            </Link>
           </div>
         </div>
 
