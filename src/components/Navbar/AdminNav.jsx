@@ -19,11 +19,17 @@ export default function AdminNav() {
   return (
     <nav className="bg-white border-b border-[#6D442C]/10 py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
       {/* Logo */}
-      <div className="flex items-center">
-        <Link to="/admin">
-          <img src="/images/snugbear.png" alt="SnugBear Logo" className="h-8 md:h-10 w-auto" />
-        </Link>
-      </div>
+      {/* Logo */}
+<div className="flex items-center">
+  <Link to="/admin">
+    <img 
+      src="/images/snugbear.png" 
+      alt="SnugBear Logo" 
+      // Increased from h-8 md:h-10 to h-12 md:h-16
+      className="h-12 md:h-16 w-auto object-contain" 
+    />
+  </Link>
+</div>
 
       {/* Desktop Menu */}
       <div className="hidden md:flex gap-8">
