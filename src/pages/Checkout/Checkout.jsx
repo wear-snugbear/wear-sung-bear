@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { motion } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 
 export default function Checkout() {
   const { cart } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate();
   
   const [formData, setFormData] = useState({ 
     name: user?.displayName || '', 
@@ -40,10 +42,13 @@ export default function Checkout() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
-      alert(`Success! Tracking ID: ${result.tracking_id}`);
-    } catch (error) {
+      
+      // Clear cart (if you have a clearCart function) and redirect
+      // clearCart(); 
+      navigate("/thank-you", { state: { trackingId: result.tracking_id } }); 
+  } catch (error) {
       alert("Something went wrong. Please try again.");
-    } finally {
+  } finally {
       setLoading(false);
     }
   };

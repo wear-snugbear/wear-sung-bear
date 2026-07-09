@@ -12,7 +12,7 @@ function Stars({ rating = 5 }) {
   return (
     <div className="flex gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} className={`text-sm ${i < rating ? "text-amber-400" : "text-gray-200"}`}>★</span>
+        <span key={i} className={`text-lg ${i < rating ? "text-[#E6AA84]" : "text-[#EEDDD3]"}`}>★</span>
       ))}
     </div>
   );
@@ -25,58 +25,65 @@ export default function CustomerReviews() {
     const interval = setInterval(() => {
       if (scrollRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        // Smoothly scroll, looping back to start
+        // Reset to start if at the end, otherwise scroll forward
         if (scrollLeft + clientWidth >= scrollWidth - 10) {
           scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
         } else {
-          scrollRef.current.scrollBy({ left: 350, behavior: "smooth" });
+          scrollRef.current.scrollBy({ left: 374, behavior: "smooth" });
         }
       }
-    }, 4000);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <section className="py-20 bg-[#FFFBF9] overflow-hidden">
-      <div className="relative max-w-7xl mx-auto">
-        <div
-          ref={scrollRef}
-          className="flex gap-6 overflow-x-auto scroll-smooth pb-10 px-6 snap-x hide-scrollbar"
-        >
-          {reviews.map((review, index) => (
-            <div
-              key={index}
-              data-review-card
-              className="min-w-[320px] md:min-w-[350px] snap-start bg-white p-6 rounded-3xl border border-[#6D442C]/10 shadow-[0_10px_30px_rgba(77,58,42,0.05)] transition-all duration-300 hover:shadow-[0_20px_40px_rgba(77,58,42,0.1)] flex flex-col group"
-            >
-              <div className="relative mb-5 overflow-hidden rounded-2xl">
-                <img src={review.img} alt={review.name} className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-[#6D442C] uppercase tracking-wider">
-                  Verified Purchase
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="font-bold text-[#4D3A2A] text-base">{review.name}</h3>
-                <Stars rating={review.rating} />
-              </div>
+    <section className="py-20 bg-[#FFFDF8]">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-[#6D442C] mb-4">From Our Community 🧸</h2>
+          <p className="text-[#A58D80] font-medium italic">Hear what our lovely customers have to say</p>
+        </div>
 
-              <p className="text-[#7A6B5C] leading-relaxed text-sm flex-grow italic">
-                "{review.text}"
-              </p>
-              
-              <div className="mt-6 pt-4 border-t border-[#6D442C]/5 flex justify-between items-center">
-                <span className="text-[10px] font-bold text-[#D4BDB5] uppercase tracking-widest">{review.date}</span>
-                <span className="text-2xl opacity-20">🎀</span>
+        <div className="relative">
+          <div
+            ref={scrollRef}
+            className="flex gap-8 overflow-x-auto scroll-smooth pb-12 snap-x hide-scrollbar"
+          >
+            {reviews.map((review, index) => (
+              <div
+                key={index}
+                data-review-card
+                className="min-w-[calc(33.333%-22px)] snap-start bg-white p-8 rounded-[2.5rem] border-2 border-[#F9E4E8] shadow-[0_8px_24px_-4px_rgba(230,170,132,0.15)] transition-transform hover:-translate-y-2 flex flex-col"
+              >
+                <div className="relative mb-6">
+                  <img src={review.img} alt={review.name} className="w-full h-72 object-cover rounded-[2rem]" />
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full shadow-sm text-xs font-bold text-[#6D442C]">
+                    Verified
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-[#6D442C] text-lg">{review.name}</h3>
+                  <Stars rating={review.rating} />
+                </div>
+
+                <p className="text-gray-600 leading-relaxed text-sm flex-grow line-clamp-4">
+                  "{review.text}"
+                </p>
+                
+                <p className="text-[10px] uppercase tracking-widest text-[#D4BDB5] mt-6 font-bold">
+                  {review.date}
+                </p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      <style jsx global>{`
+      <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @media (max-width: 1024px) { [data-review-card] { min-width: calc(50% - 16px) !important; } }
+        @media (max-width: 640px) { [data-review-card] { min-width: 100% !important; } }
       `}</style>
     </section>
   );

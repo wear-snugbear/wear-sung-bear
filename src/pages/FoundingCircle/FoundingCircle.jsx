@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = "https://snugbear-backend-dosj.onrender.com";
 
@@ -10,7 +10,7 @@ export default function FoundingCircle() {
   const [loading, setLoading] = useState(false);
   const [isAnimating, setIsAnimating] = useState(true);
   
-  const navigate = useNavigate(); // 2. Initialize navigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${API_BASE}/api/products`)
@@ -43,7 +43,7 @@ export default function FoundingCircle() {
       
       if (response.ok) {
         alert("Welcome to the Founding Circle! Your gift is secured. 🧸");
-        navigate("/"); // 3. Redirect to Home page after success
+        navigate("/");
       } else {
         alert("Could not secure gift. Please try again!");
       }
@@ -55,7 +55,6 @@ export default function FoundingCircle() {
   };
 
   return (
-    // ... rest of your JSX remains the same
     <div className="min-h-screen bg-[#FFFBF9] flex items-center justify-center p-4">
       <AnimatePresence mode="wait">
         
@@ -65,12 +64,17 @@ export default function FoundingCircle() {
             exit={{ opacity: 0, scale: 0.8 }}
             className="text-center"
           >
+            {/* Updated: Image instead of Bear Emoji */}
             <motion.div 
               animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
               transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-              className="text-[100px] mb-6 block"
+              className="mb-6 flex justify-center"
             >
-              🧸
+              <img 
+                src="/images/bear.png" 
+                alt="Consulting the Bear" 
+                className="w-32 h-32 md:w-40 md:h-40 object-contain" 
+              />
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}

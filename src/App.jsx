@@ -26,7 +26,7 @@ import Login from "./pages/Login/Login.jsx";
 import Signup from "./pages/Signup/Signup.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import Returns from "./pages/Returns/Returns.jsx";
-
+import ThankYou from "./pages/ThankYou/ThankYou.jsx";
 // Add this helper component in App.jsx (above AppContent)
 function ProtectedRoute({ children }) {
   const isAdmin = localStorage.getItem("isAdmin") === "true";
@@ -85,6 +85,7 @@ function AppContent() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/returns" element={<Returns />} />
+          <Route path="/thank-you" element={<ThankYou />} />
           
         </Routes>
       </main>

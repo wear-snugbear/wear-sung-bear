@@ -627,9 +627,6 @@ export default function Collections() {
         </div>
       </div>
       <div className="mt-24 mb-10">
-        <div className="text-center mb-10">
-           <h3 className="text-2xl font-bold text-[#6D442C]">Loved by our Community 🧸</h3>
-        </div>
         <Reviews onlyImages={true} />
       </div>
 
